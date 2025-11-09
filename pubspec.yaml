@@ -1,0 +1,55 @@
+name: new_packers_application
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  cupertino_icons: ^1.0.8
+  provider: ^6.0.5
+  url_launcher: ^6.1.10
+  google_maps_flutter: ^2.3.0
+  geolocator: ^14.0.2
+  geocoding: ^2.0.5
+  fluttertoast: ^8.2.1
+  intl: ^0.18.0
+  shared_preferences: ^2.3.0
+  sms_autofill: ^2.3.0
+  razorpay_flutter: ^1.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/applogo.jpeg
+    - assets/home-shifting.jpeg
+    - assets/home.png
+    - assets/parcelwala4.jpg
+    - assets/parcelwala5.jpg
+    - assets/parcelwala6.jpg
+    - assets/parcelwala7.jpg
+    - assets/parcelwala8.jpg
+    - assets/parcelwala9.jpg
+    - assets/applogowithminsize.jpg
+    - assets/applogo2.jpg
+
+# flutter_launcher_icons config
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/applogo2.jpg"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/applogo2.jpg"
+  min_sdk_android: 21
