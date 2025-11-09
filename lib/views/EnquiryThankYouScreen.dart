@@ -308,12 +308,14 @@ class EnquiryThankYouScreen extends StatelessWidget {
                         enquiryResponse.data?.pickupLocation ?? 'N/A'),
                     _buildDetailRow('Drop Location:',
                         enquiryResponse.data?.dropLocation ?? 'N/A'),
-                    _buildDetailRow(
-                      'Flat/Shop No:',
-                      enquiryResponse.data?.flatShopNo == 'NONE'
-                          ? 'NA'
-                          : (enquiryResponse.data?.flatShopNo ?? 'N/A'),
-                    ),
+                    if (enquiryResponse.data?.flatShopNo != 'NONE') ...[
+                      _buildDetailRow(
+                        'Flat/Shop No:',
+                        enquiryResponse.data?.flatShopNo == 'NONE'
+                            ? 'NA'
+                            : (enquiryResponse.data?.flatShopNo ?? 'N/A'),
+                      ),
+                    ],
                     _buildDetailRow(
                       'Shifting Date:',
                       AppFormatter.dateFormater(
@@ -397,7 +399,6 @@ class EnquiryThankYouScreen extends StatelessWidget {
                     //       builder: (context) => const HomeServiceView()),
                     //   (Route<dynamic> route) => false,
                     // );
-                    log("Tap");
 
                     Navigator.pushReplacement(
                       context,

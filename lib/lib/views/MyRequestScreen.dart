@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:new_packers_application/lib/constant/app_formatter.dart';
 
 import '../../views/PendingScreen.dart';
 
@@ -36,10 +39,10 @@ class _MyRequestScreenState extends State<MyRequestScreen> {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-
         if (jsonData["status"] == true) {
           setState(() {
             enquiries = jsonData["data"];
+            log('Data req len---->>${response.body}');
             isLoading = false;
           });
         } else {
@@ -168,11 +171,6 @@ class _MyRequestScreenState extends State<MyRequestScreen> {
                       fontSize: 14, color: Colors.black54),
                 ),
                 Text(
-                  "To: ${enquiry["drop_location"] ?? ""}",
-                  style: const TextStyle(
-                      fontSize: 14, color: Colors.black54),
-                ),
-                Text(
                   "Floor: ${enquiry["floor_number"] ?? "-"}",
                   style: const TextStyle(
                       fontSize: 14, color: Colors.black54),
@@ -183,7 +181,27 @@ class _MyRequestScreenState extends State<MyRequestScreen> {
                       fontSize: 14, color: Colors.black54),
                 ),
                 Text(
+                  "To: ${enquiry["drop_location"] ?? ""}",
+                  style: const TextStyle(
+                      fontSize: 14, color: Colors.black54),
+                ),
+                Text(
                   "Lift (Drop): ${enquiry["drop_services_lift"] ?? "-"}",
+                  style: const TextStyle(
+                      fontSize: 14, color: Colors.black54),
+                ),
+                Text(
+                  "Shifting Date: ${AppFormatter.dateFormater(date: enquiry["shipping_date_time"] ?? "N/A")}",
+                  style: const TextStyle(
+                      fontSize: 14, color: Colors.black54),
+                ),
+                Text(
+                  "Shifting Time: ${AppFormatter.timeFormater(date: enquiry["shipping_date_time"] ?? "N/A")}",
+                  style: const TextStyle(
+                      fontSize: 14, color: Colors.black54),
+                ),
+                Text(
+                  "Created Date: ${AppFormatter.dateFormater(date: enquiry["created_at"] ?? "N/A")}",
                   style: const TextStyle(
                       fontSize: 14, color: Colors.black54),
                 ),
@@ -192,7 +210,7 @@ class _MyRequestScreenState extends State<MyRequestScreen> {
                 // Products
                 if (products.isNotEmpty) ...[
                   const Text(
-                    "Products:",
+                    "Inventory:",
                     style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

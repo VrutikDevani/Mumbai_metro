@@ -10,4 +10,14 @@ class AppFormatter {
       return formattedDate;
     }
   }
+
+  static String timeFormater({required String date}) {
+    if (date == 'N/A') {
+      return 'N/A';
+    } else {
+      DateTime dateTime = DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
+      String formattedTime = DateFormat('hh:mm a').format(dateTime);
+      return formattedTime;
+    }
+  }
 }

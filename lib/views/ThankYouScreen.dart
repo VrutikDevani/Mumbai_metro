@@ -351,7 +351,7 @@ class ThankYouScreen extends StatelessWidget {
                       _buildDetailRow('Location:',
                           serviceResponse.data?.serviceLocation ?? 'N/A'),
                     ],
-                    if (serviceResponse.data?.destinationLocation != null ||
+                    if (serviceResponse.data?.destinationLocation != null &&
                         serviceResponse.data?.destinationLocation !=
                             'NONE') ...[
                       _buildDetailRow('Pickup Location:',
@@ -363,7 +363,7 @@ class ThankYouScreen extends StatelessWidget {
                         ? _buildDetailRow('Vehicle:',
                             serviceResponse.data?.vehicleDetails ?? 'N/A')
                         : SizedBox(),
-                    if (serviceResponse.data?.notes != null ||
+                    if (serviceResponse.data?.notes != null &&
                         serviceResponse.data?.notes !=
                             '') ...[
                       _buildDetailRow('Notes:',
