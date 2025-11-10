@@ -1,12 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
+import '../../views/ACServicesScreen.dart' as AppColors;
 import '../../views/OTPScreen.dart';
 import '../../views/signupOtpView.dart';
 import '../viewmodels/login_viewmodel.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
   static const Color darkBlue = Color(0xFF03669d);
@@ -14,30 +17,59 @@ class LoginView extends StatelessWidget {
   static const Color lightBlue = Color(0xFF7ed2f7);
   static const Color whiteColor = Color(0xFFf7f7f7);
 
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  _showSnack({required String text, required bool isError}) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: isError ? Colors.red : Colors.green,
+        content: Text(
+          text,
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.normal,
+            color: AppColors.whiteColor,
+            backgroundColor: isError ? Colors.red : Colors.green,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
   // Function to send OTP
   Future<bool> sendOTP(String mobileNumber) async {
     try {
       String baseUrl = 'http://54kidsstreet.org'; // Domain
-      final url = '$baseUrl/api/customers/$mobileNumber/otp';
+      final url = '$baseUrl/api/customers/login';
       print('Sending OTP to: $url');
-
+      final Map<String, dynamic> body = {
+        "mobile_no": mobileNumber,
+      };
       final response = await http.post(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
+        body: jsonEncode(body),
       );
 
       print('Send OTP Response Status: ${response.statusCode}');
       print('Send OTP Response Body: ${response.body}');
 
+      final res = jsonDecode(response.body);
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
+        _showSnack(text: res['message'], isError: true);
         return false;
       }
     } catch (e) {
+      _showSnack(text: e.toString(), isError: true);
       print('Error sending OTP: $e');
       return false;
     }
@@ -52,7 +84,7 @@ class LoginView extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: const Text('Login'),
-              backgroundColor: darkBlue,
+              backgroundColor: LoginView.darkBlue,
               foregroundColor: Colors.white,
             ),
             body: Padding(
@@ -80,8 +112,7 @@ class LoginView extends StatelessWidget {
                             SizedBox(width: 6),
                             Text('+91',
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500)),
+                                    fontSize: 16, fontWeight: FontWeight.w500)),
                           ],
                         ),
                       ),
@@ -100,48 +131,50 @@ class LoginView extends StatelessWidget {
                     onPressed: viewModel.isLoading
                         ? null
                         : () async {
-                      if (viewModel.mobileNumber.length == 10) {
-                        viewModel.setLoading(true);
-                        bool otpSent = await sendOTP(viewModel.mobileNumber);
-                        viewModel.setLoading(false);
+                            if (viewModel.mobileNumber.length == 10) {
+                              viewModel.setLoading(true);
+                              bool otpSent =
+                                  await sendOTP(viewModel.mobileNumber);
+                              viewModel.setLoading(false);
 
-                        if (otpSent) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OTPScreen(
-                                mobileNumber: viewModel.mobileNumber,
-                                source: 1, // from login
-                              ),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Failed to send OTP'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Enter a valid 10-digit number'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
+                              if (otpSent) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OTPScreen(
+                                      mobileNumber: viewModel.mobileNumber,
+                                      source: 1, // from login
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Failed to send OTP'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text('Enter a valid 10-digit number'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: darkBlue,
+                      backgroundColor: LoginView.darkBlue,
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: viewModel.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                      'Login',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                            'Login',
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                   const SizedBox(height: 10),
                   TextButton(
