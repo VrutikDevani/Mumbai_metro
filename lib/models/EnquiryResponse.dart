@@ -6,6 +6,7 @@ class EnquiryData {
   final String flatShopNo;
   final String shippingDateTime;
   final String floorNumber;
+  final String destinationFloorNumber;
   final String pickupServicesLift;
   final String dropServicesLift;
   final String productsItem;
@@ -28,6 +29,7 @@ class EnquiryData {
     required this.productsItem,
     required this.orderNo,
     required this.distance,
+    required this.destinationFloorNumber,
     required this.amount,
     required this.updatedAt,
     required this.createdAt,
@@ -42,6 +44,7 @@ class EnquiryData {
       flatShopNo: json['flat_shop_no'] ?? '',
       shippingDateTime: json['shipping_date_time'] ?? '',
       floorNumber: json['floor_number'] ?? '',
+      destinationFloorNumber: json['destination_floor_number'] ?? '',
       pickupServicesLift: json['pickup_services_lift'] ?? '',
       dropServicesLift: json['drop_services_lift'] ?? '',
       productsItem: json['products_item'] ?? '',

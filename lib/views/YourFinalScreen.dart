@@ -63,7 +63,8 @@ class _YourFinalScreenState extends State<YourFinalScreen> {
       request.fields['flat_shop_no'] = '${widget.shiftData.floorSource}F';
       request.fields['shipping_date_time'] = '${widget.shiftData.selectedDate} ${widget.shiftData.selectedTime}';
       request.fields['floor_number'] = /*_formatFloorNumber(widget.shiftData.floorSource);*/ widget.shiftData.floorSource.toString();
-      request.fields['pickup_services_lift'] = /*widget.shiftData.serviceLiftSource ? 'YES' : 'NO'*/ widget.shiftData.serviceLiftSource ? '0' : '1';
+      request.fields['destination_floor_number'] = /*_formatFloorNumber(widget.shiftData.floorSource);*/ widget.shiftData.floorSource.toString();
+      request.fields['pickup_services_lift'] = /*widget.shiftData.serviceLiftSource ? 'YES' : 'NO'*/ widget.shiftData.floorDestination.toString();
       request.fields['drop_services_lift'] = /*widget.shiftData.serviceLiftDestination ? 'YES' : 'NO'*/ widget.shiftData.serviceLiftSource ? '0' : '1';
       request.fields.addAll(_formatProductsForAPI());
       request.fields['km_distance'] = '0';

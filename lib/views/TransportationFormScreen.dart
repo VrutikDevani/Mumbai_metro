@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:new_packers_application/lib/constant/app_formatter.dart';
 
 import '../lib/views/map_picker_screen.dart';
 import '../models/ServiceEnquiryData.dart';
@@ -45,11 +46,22 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
   final _vehicleModelController = TextEditingController();
 
   DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
+  // TimeOfDay? _selectedTime;
   LatLng? _pickupCoordinates;
   LatLng? _destinationCoordinates;
   bool _isSubmitting = false;
   String _locationType = '';
+
+  String selectedTime = '';
+
+  final List<String> timeSlots = [
+    '09:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '12:00 PM',
+    '01:00 PM',
+    '02:00 PM'
+  ];
 
   @override
   void initState() {
@@ -83,30 +95,30 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
     }
   }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: darkBlue,
-              onPrimary: whiteColor,
-              surface: whiteColor,
-            ),
-            dialogBackgroundColor: whiteColor,
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
-  }
+  // Future<void> _selectTime(BuildContext context) async {
+  //   final TimeOfDay? picked = await showTimePicker(
+  //     context: context,
+  //     initialTime: TimeOfDay.now(),
+  //     builder: (context, child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           colorScheme: const ColorScheme.light(
+  //             primary: darkBlue,
+  //             onPrimary: whiteColor,
+  //             surface: whiteColor,
+  //           ),
+  //           dialogBackgroundColor: whiteColor,
+  //         ),
+  //         child: child!,
+  //       );
+  //     },
+  //   );
+  //   if (picked != null && picked != _selectedTime) {
+  //     setState(() {
+  //       _selectedTime = picked;
+  //     });
+  //   }
+  // }
 
   Future<void> _pickLocation(String type) async {
     setState(() {
@@ -154,7 +166,7 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
           ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
           : '';
       request.fields['service_time'] =
-          _selectedTime != null ? _selectedTime!.format(context) : '';
+          selectedTime != '' ? AppFormatter.onlyTimeFormatter(selectedTime):'';
       request.fields['pickup_location'] = _pickupLocationController.text.trim();
       request.fields['drop_location'] =
           _destinationLocationController.text.trim();
@@ -163,16 +175,14 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
       // request.fields['notes'] = .text.trim();
 
       request.fields['shipping_date_time'] =
-          _selectedDate != null && _selectedTime != null
-              ? '${DateFormat('yyyy-MM-dd HH:mm:ss').format(
+          _selectedDate != null && selectedTime != ''
+              ? '${DateFormat('yyyy-MM-dd').format(
                   DateTime(
                     _selectedDate!.year,
                     _selectedDate!.month,
                     _selectedDate!.day,
-                    _selectedTime!.hour,
-                    _selectedTime!.minute,
                   ),
-                )}'
+                )} ${AppFormatter.onlyTimeFormatter(selectedTime)}'
               : '';
 
       if (_pickupCoordinates != null) {
@@ -213,7 +223,7 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
   void _submitForm() async {
     if (_formKey.currentState!.validate() &&
         _selectedDate != null &&
-        _selectedTime != null) {
+        selectedTime != '') {
       setState(() {
         _isSubmitting = true;
       });
@@ -260,7 +270,7 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a date')),
         );
-      } else if (_selectedTime == null) {
+      } else if (selectedTime == '') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a time')),
         );
@@ -391,10 +401,10 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
                                   widget.categoryDesc!,
                                   style: const TextStyle(
                                     fontFamily: 'Poppins',
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     color: Colors.grey,
                                   ),
-                                  maxLines: 3,
+                                  maxLines: 10,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                             ],
@@ -471,38 +481,67 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
                           ),
                           const SizedBox(width: 12),
                           // Time Field
+                          // Expanded(
+                          //   child: InkWell(
+                          //     onTap: () => _selectTime(context),
+                          //     child: InputDecorator(
+                          //       decoration: InputDecoration(
+                          //         labelText: 'Time',
+                          //         labelStyle: const TextStyle(color: darkBlue),
+                          //         border: OutlineInputBorder(
+                          //           borderRadius: BorderRadius.circular(10),
+                          //         ),
+                          //         focusedBorder: OutlineInputBorder(
+                          //           borderSide:
+                          //               const BorderSide(color: mediumBlue),
+                          //           borderRadius: BorderRadius.circular(10),
+                          //         ),
+                          //       ),
+                          //       child: Text(
+                          //         _selectedTime == null
+                          //             ? 'Select time'
+                          //             : _selectedTime!.format(context),
+                          //         style: TextStyle(
+                          //           color: _selectedTime == null
+                          //               ? Colors.grey
+                          //               : darkBlue,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                           Expanded(
-                            child: InkWell(
-                              onTap: () => _selectTime(context),
-                              child: InputDecorator(
-                                decoration: InputDecoration(
-                                  labelText: 'Time',
-                                  labelStyle: const TextStyle(color: darkBlue),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        const BorderSide(color: mediumBlue),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
+                            child: DropdownButtonFormField<String>(
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                hintText: 'Select time',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(color: Colors.grey),
                                 ),
-                                child: Text(
-                                  _selectedTime == null
-                                      ? 'Select time'
-                                      : _selectedTime!.format(context),
-                                  style: TextStyle(
-                                    color: _selectedTime == null
-                                        ? Colors.grey
-                                        : darkBlue,
-                                  ),
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
                               ),
+                              value: selectedTime.isEmpty ? null : selectedTime,
+                              items: timeSlots.map((String time) {
+                                return DropdownMenuItem<String>(
+                                  value: time,
+                                  child:
+                                  Text(time, overflow: TextOverflow.ellipsis),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedTime = newValue;
+                                  });
+                                }
+                              },
                             ),
                           ),
                         ],
                       ),
-                      if (_selectedDate == null || _selectedTime == null)
+                      if (_selectedDate == null || selectedTime == '')
                         const Padding(
                           padding: EdgeInsets.only(top: 8.0),
                           child: Text(

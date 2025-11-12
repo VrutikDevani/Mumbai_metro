@@ -86,7 +86,6 @@ class _EnquiryBookingConfirmationWithAmountState
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
               Container(
                 height: 50,
                 width: 50,
@@ -342,7 +341,7 @@ class EnquiryThankYouScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Your Booking Details:',
+                      'Your Enquiry Details:',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -378,8 +377,15 @@ class EnquiryThankYouScreen extends StatelessWidget {
                       AppFormatter.dateFormater(
                           date: enquiryResponse.data?.createdAt ?? 'N/A'),
                     ),
-                    _buildDetailRow('Floor Number:',
+                    _buildDetailRow('Pickup Floor Number:',
                         enquiryResponse.data?.floorNumber ?? 'N/A'),
+                    if (enquiryResponse.data?.flatShopNo == 'NONE' &&
+                        enquiryResponse.data?.destinationFloorNumber != '') ...[
+                      _buildDetailRow(
+                          'Destination Floor Number:',
+                          enquiryResponse.data?.destinationFloorNumber ??
+                              'N/A'),
+                    ],
                     _buildDetailRow('Pickup Service Lift:',
                         enquiryResponse.data?.pickupServicesLift ?? 'N/A'),
                     _buildDetailRow('Drop Service Lift:',

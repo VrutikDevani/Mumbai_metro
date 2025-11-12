@@ -37,10 +37,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       TextEditingController();
   final TextEditingController _destinationLocalityController =
       TextEditingController();
-  bool _normalLiftSource = false;
+  // bool _normalLiftSource = false;
   bool _serviceLiftSource = false;
   int _floorSource = 0;
-  bool _normalLiftDestination = false;
+  // bool _normalLiftDestination = false;
   bool _serviceLiftDestination = false;
   int _floorDestination = 0;
 
@@ -58,10 +58,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    _normalLiftSource = widget.shiftData.normalLiftSource;
+    // _normalLiftSource = widget.shiftData.normalLiftSource;
     _serviceLiftSource = widget.shiftData.serviceLiftSource;
     _floorSource = widget.shiftData.floorSource;
-    _normalLiftDestination = widget.shiftData.normalLiftDestination;
+    // _normalLiftDestination = widget.shiftData.normalLiftDestination;
     _serviceLiftDestination = widget.shiftData.serviceLiftDestination;
     _floorDestination = widget.shiftData.floorDestination;
     _sourceLocalityController.text = widget.shiftData.sourceAddress ?? '';
@@ -494,10 +494,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                               widget.shiftData.categoryDesc!,
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 12,
+                                fontSize: 14,
                                 color: Colors.grey,
                               ),
-                              maxLines: 3,
+                              maxLines: 10,
                               overflow: TextOverflow.ellipsis,
                             ),
                           const SizedBox(height: 16),
@@ -743,20 +743,20 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                   //       },
                   //     ),
                   //   ),
-                  const SizedBox(height: 8),
+                  // const SizedBox(height: 8),
+                  // CheckboxListTile(
+                  //   title: const Text('Normal Lift Available'),
+                  //   value: _normalLiftSource,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _normalLiftSource = value!;
+                  //       widget.shiftData.normalLiftSource = value;
+                  //     });
+                  //   },
+                  //   controlAffinity: ListTileControlAffinity.trailing,
+                  // ),
                   CheckboxListTile(
-                    title: const Text('Normal Lift Available'),
-                    value: _normalLiftSource,
-                    onChanged: (value) {
-                      setState(() {
-                        _normalLiftSource = value!;
-                        widget.shiftData.normalLiftSource = value;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.trailing,
-                  ),
-                  CheckboxListTile(
-                    title: const Text('Service Lift Available'),
+                    title: const Text('Lift Available'),
                     value: _serviceLiftSource,
                     onChanged: (value) {
                       setState(() {
@@ -831,19 +831,19 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
+                  // CheckboxListTile(
+                  //   title: const Text('Normal Lift Available'),
+                  //   value: _normalLiftDestination,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _normalLiftDestination = value!;
+                  //       widget.shiftData.normalLiftDestination = value;
+                  //     });
+                  //   },
+                  //   controlAffinity: ListTileControlAffinity.trailing,
+                  // ),
                   CheckboxListTile(
-                    title: const Text('Normal Lift Available'),
-                    value: _normalLiftDestination,
-                    onChanged: (value) {
-                      setState(() {
-                        _normalLiftDestination = value!;
-                        widget.shiftData.normalLiftDestination = value;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.trailing,
-                  ),
-                  CheckboxListTile(
-                    title: const Text('Service Lift Available'),
+                    title: const Text('Lift Available'),
                     value: _serviceLiftDestination,
                     onChanged: (value) {
                       setState(() {

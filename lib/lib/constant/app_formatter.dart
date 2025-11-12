@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:intl/intl.dart';
 
 class AppFormatter {
@@ -18,6 +20,20 @@ class AppFormatter {
       DateTime dateTime = DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
       String formattedTime = DateFormat('hh:mm a').format(dateTime);
       return formattedTime;
+    }
+  }
+
+  static String onlyTimeFormatter(String timeString) {
+
+    try {
+      DateTime time = DateFormat("hh:mm a").parse(timeString);
+
+      String formattedTime = DateFormat("HH:mm:ss").format(time);
+
+      return formattedTime;
+    } catch (e) {
+      log("❌ Error parsing time: $e");
+      return '';
     }
   }
 }

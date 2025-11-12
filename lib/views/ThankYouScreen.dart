@@ -326,7 +326,7 @@ class ThankYouScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Booking Details:',
+                      'Enquiry Details:',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:new_packers_application/lib/constant/app_drawer.dart';
 import 'package:new_packers_application/views/VendorRegScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -158,8 +159,7 @@ class _HomeServiceViewState extends State<HomeServiceView> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            VendorRegScreen(),
+        builder: (context) => VendorRegScreen(),
       ),
     );
   }
@@ -304,9 +304,14 @@ class _HomeServiceViewState extends State<HomeServiceView> {
     );
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const AppDrawer(),
+      //
       backgroundColor: darkBlue,
       appBar: AppBar(
         title: const Text(
@@ -325,7 +330,9 @@ class _HomeServiceViewState extends State<HomeServiceView> {
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: whiteColor),
-            onPressed: () {},
+            onPressed: () {
+              _scaffoldKey.currentState!.openDrawer();
+            },
           ),
         ),
         actions: [
