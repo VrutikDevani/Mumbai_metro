@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -57,8 +58,8 @@ class _LoginViewState extends State<LoginView> {
         body: jsonEncode(body),
       );
 
-      print('Send OTP Response Status: ${response.statusCode}');
-      print('Send OTP Response Body: ${response.body}');
+      log('Send OTP Response Status: ${response.statusCode}');
+      log('Send OTP Response Body: ${response.body}');
 
       final res = jsonDecode(response.body);
 
@@ -70,7 +71,7 @@ class _LoginViewState extends State<LoginView> {
       }
     } catch (e) {
       _showSnack(text: e.toString(), isError: true);
-      print('Error sending OTP: $e');
+      log('Error sending OTP: $e');
       return false;
     }
   }
@@ -145,13 +146,6 @@ class _LoginViewState extends State<LoginView> {
                                       mobileNumber: viewModel.mobileNumber,
                                       source: 1, // from login
                                     ),
-                                  ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Failed to send OTP'),
-                                    backgroundColor: Colors.red,
                                   ),
                                 );
                               }

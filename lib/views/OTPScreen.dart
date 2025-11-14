@@ -14,7 +14,8 @@ class OTPScreen extends StatefulWidget {
   final String mobileNumber;
   final int source;
 
-  const OTPScreen({super.key, required this.mobileNumber, required this.source});
+  const OTPScreen(
+      {super.key, required this.mobileNumber, required this.source});
 
   @override
   State<OTPScreen> createState() => _OTPScreenState();
@@ -26,7 +27,7 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
   static const Color lightBlue = Color(0xFF7ed2f7);
 
   List<TextEditingController> otpControllers =
-  List.generate(6, (index) => TextEditingController());
+      List.generate(6, (index) => TextEditingController());
   List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
 
   bool isLoading = false;
@@ -47,14 +48,16 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
     try {
       // Get app signature (needed for SMS retriever API)
       appSignature = await SmsAutoFill().getAppSignature;
-      developer.log('[OTPScreen] App Signature: $appSignature', name: 'flutter');
+      developer.log('[OTPScreen] App Signature: $appSignature',
+          name: 'flutter');
 
       // Listen for OTP
       await SmsAutoFill().listenForCode();
 
       developer.log('[OTPScreen] SMS Listener initialized', name: 'flutter');
     } catch (e) {
-      developer.log('[OTPScreen] Error initializing SMS listener: $e', name: 'flutter');
+      developer.log('[OTPScreen] Error initializing SMS listener: $e',
+          name: 'flutter');
     }
   }
 
@@ -105,14 +108,16 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
   }
 
   String getOTP() {
-    final otp = otpControllers.map((controller) => controller.text).join().trim();
+    final otp =
+        otpControllers.map((controller) => controller.text).join().trim();
     return otp;
   }
 
   Future<OtpResponse?> verifyOTP(String otp) async {
     try {
       String baseUrl = 'http://54kidsstreet.org';
-      final url = '$baseUrl/api/customers/${widget.mobileNumber}/otpverify?otp=$otp';
+      final url =
+          '$baseUrl/api/customers/${widget.mobileNumber}/otpverify?otp=$otp';
 
       final response = await http.put(
         Uri.parse(url),
@@ -133,17 +138,19 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
 
             if (otpResponse.status) {
               final prefs = await SharedPreferences.getInstance();
-              await prefs.setBool('isLoggedIn', true);
-              await prefs.setString('customerId', otpResponse.customerId.toString());
+              await prefs.setString(
+                  'customerId', otpResponse.customerId.toString());
               return otpResponse;
             } else {
               return null;
             }
           } catch (e) {
-            return OtpResponse(status: true, msg: 'OTP verified successfully', customerId: 0);
+            return OtpResponse(
+                status: true, msg: 'OTP verified successfully', customerId: 0);
           }
         } else {
-          return OtpResponse(status: true, msg: 'OTP verified successfully', customerId: 0);
+          return OtpResponse(
+              status: true, msg: 'OTP verified successfully', customerId: 0);
         }
       } else {
         return null;
@@ -209,13 +216,14 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
     });
 
     if (otpResponse != null && otpResponse.status) {
+      developer.log('Message--->>${widget.source}-->>${otpResponse}');
       if (widget.source == 1) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeServiceView(
-              customerId: otpResponse.customerId,
-            ),
+            builder: (context) => HomeServiceView(),
           ),
         );
       } else if (widget.source == 2) {
@@ -352,7 +360,9 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap: resendTimer == 0 && !isResendLoading ? handleResendOTP : null,
+                          onTap: resendTimer == 0 && !isResendLoading
+                              ? handleResendOTP
+                              : null,
                           child: Text(
                             'Resend OTP',
                             style: TextStyle(
@@ -380,7 +390,8 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
                             height: 16,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(darkBlue),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(darkBlue),
                             ),
                           )
                         else
@@ -428,8 +439,9 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
                       onTap: () {
                         otpControllers[index].selection =
                             TextSelection.fromPosition(
-                              TextPosition(offset: otpControllers[index].text.length),
-                            );
+                          TextPosition(
+                              offset: otpControllers[index].text.length),
+                        );
                       },
                     ),
                   );
@@ -451,17 +463,17 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
                     ),
                     child: isLoading
                         ? const CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    )
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          )
                         : const Text(
-                      'Submit',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                            'Submit',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                 ),
               ),

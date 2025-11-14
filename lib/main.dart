@@ -29,10 +29,7 @@ class MyApp extends StatelessWidget {
       if (userDataJson != null) {
         userData = UserData.fromJson(jsonDecode(userDataJson));
       }
-      return HomeServiceView(
-        customerId: int.parse(customerId),
-        userData: userData,
-      );
+      return HomeServiceView();
     }
     return const LoginView();
   }

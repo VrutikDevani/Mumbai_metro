@@ -376,8 +376,8 @@ class ThankYouScreen extends StatelessWidget {
                     ),
                     _buildDetailRow(
                       'Created Date:',
-                      AppFormatter.dateFormater(
-                          date: serviceResponse.data?.createdAt ?? 'N/A'),
+                      AppFormatter.convertCreateDate(
+                          input: serviceResponse.data?.createdAt ?? 'N/A'),
                     ),
                     serviceResponse.data?.serviceDescription != 'NONE'
                         ? _buildDetailRow('Description:',

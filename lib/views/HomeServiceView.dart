@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -6,6 +8,7 @@ import 'package:new_packers_application/lib/constant/app_drawer.dart';
 import 'package:new_packers_application/views/VendorRegScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../lib/models/customer_data_model.dart';
 import '../lib/views/MyRequestScreen.dart';
 import '../lib/views/login_view.dart';
 import '../models/UserData.dart';
@@ -17,10 +20,7 @@ const Color lightBlue = Color(0xFF7ed2f7);
 const Color whiteColor = Color(0xFFf7f7f7);
 
 class HomeServiceView extends StatefulWidget {
-  final UserData? userData;
-  final int? customerId;
-
-  const HomeServiceView({super.key, this.userData, this.customerId});
+  const HomeServiceView();
 
   @override
   State<HomeServiceView> createState() => _HomeServiceViewState();
@@ -39,9 +39,44 @@ class _HomeServiceViewState extends State<HomeServiceView> {
   @override
   void initState() {
     super.initState();
-
+    fetchData();
     _fetchCategories();
     _fetchBanners();
+  }
+
+  CustomerModel? customerModel;
+
+  bool isLoading = false;
+
+  fetchData() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final String baseUrl = "http://54kidsstreet.org";
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? customerId = prefs.getString('customerId');
+      final response = await http.get(
+        Uri.parse("$baseUrl/api/customer/${customerId ?? ''}"),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+
+      log("➡ API Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        customerModel = CustomerModel.fromJson(jsonDecode(response.body));
+      } else {
+        log("⚠ Something went wrong");
+      }
+    } catch (e) {
+      log("❌ Error fetching customer: $e");
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void _startBannerTimer() {
@@ -145,12 +180,14 @@ class _HomeServiceViewState extends State<HomeServiceView> {
     super.dispose();
   }
 
-  void _navigateToMyRequest() {
+  Future<void> _navigateToMyRequest() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? customerId = prefs.getString('customerId');
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-            MyRequestScreen(customerId: widget.customerId ?? 0),
+            MyRequestScreen(customerId: int.parse(customerId ?? '0')),
       ),
     );
   }
@@ -242,14 +279,16 @@ class _HomeServiceViewState extends State<HomeServiceView> {
     IconData defaultIcon = Icons.category;
 
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
+        final prefs = await SharedPreferences.getInstance();
+        final String? customerId = prefs.getString('customerId');
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => SubCategoryScreen(
               categoryId: category["id"],
               categoryName: name,
-              customerId: widget.customerId,
+              customerId: int.parse(customerId ?? '0'),
               categoryBannerImg: bannerImg,
               categoryDesc: description,
             ),
@@ -343,106 +382,122 @@ class _HomeServiceViewState extends State<HomeServiceView> {
           ),
         ],
       ),
-      body: Container(
-        color: whiteColor,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Hi, ${widget.userData?.customerName ?? 'User'}',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
-                    color: darkBlue,
+      body: isLoading
+          ? Expanded(
+            child: Container(
+              color: Colors.white,
+              child: Center(
+                child: SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: CircularProgressIndicator(),
                   ),
-                ),
               ),
             ),
-            Container(
-              height: 200,
-              color: lightBlue,
-              child: isLoadingBanners
-                  ? const Center(child: CircularProgressIndicator())
-                  : PageView.builder(
-                      controller: _pageController,
-                      itemCount: bannerImages.length,
-                      onPageChanged: (index) {
-                        setState(() {
-                          currentIndex = index;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        final imagePath = bannerImages[index];
-                        final isNetwork = _isNetworkImage(imagePath);
-
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: isNetwork
-                              ? FadeInImage.assetNetwork(
-                                  placeholder: 'assets/parcelwala4.jpg',
-                                  image: imagePath,
-                                  fit: BoxFit.cover,
-                                  imageErrorBuilder: (c, e, s) => Image.asset(
-                                      'assets/parcelwala4.jpg',
-                                      fit: BoxFit.cover),
-                                )
-                              : Image.asset(imagePath, fit: BoxFit.cover),
-                        );
-                      },
-                    ),
-            ),
-            const SizedBox(height: 20),
-            isLoadingCategories
-                ? const Center(child: CircularProgressIndicator())
-                : Expanded(
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      padding: const EdgeInsets.all(16.0),
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 2.0,
-                      children: [
-                        ...categories.map((cat) => _buildCategoryButton(cat)),
-                        _buildButton('My Request', Icons.check_circle,
-                            onTap: _navigateToMyRequest),
-                        _buildButton('Call Us', Icons.call,
-                            onTap: _makePhoneCall),
-                        _buildButton(
-                          'Vendor Registration',
-                          Icons.person,
-                          onTap: _navigateToVendorReg,
+          )
+          : Container(
+              color: whiteColor,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Hi, ${customerModel?.data.customerName ?? 'User'}',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          color: darkBlue,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _openWhatsApp,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  Container(
+                    height: 200,
+                    color: lightBlue,
+                    child: isLoadingBanners
+                        ? const Center(child: CircularProgressIndicator())
+                        : PageView.builder(
+                            controller: _pageController,
+                            itemCount: bannerImages.length,
+                            onPageChanged: (index) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
+                            itemBuilder: (context, index) {
+                              final imagePath = bannerImages[index];
+                              final isNetwork = _isNetworkImage(imagePath);
+
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: isNetwork
+                                    ? FadeInImage.assetNetwork(
+                                        placeholder: 'assets/parcelwala4.jpg',
+                                        image: imagePath,
+                                        fit: BoxFit.cover,
+                                        imageErrorBuilder: (c, e, s) =>
+                                            Image.asset(
+                                                'assets/parcelwala4.jpg',
+                                                fit: BoxFit.cover),
+                                      )
+                                    : Image.asset(imagePath, fit: BoxFit.cover),
+                              );
+                            },
+                          ),
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.chat, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text('Chat with us', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
+                  const SizedBox(height: 20),
+                  isLoadingCategories
+                      ? const Center(child: CircularProgressIndicator())
+                      : Expanded(
+                          child: GridView.count(
+                            crossAxisCount: 2,
+                            padding: const EdgeInsets.all(16.0),
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 2.0,
+                            children: [
+                              ...categories
+                                  .map((cat) => _buildCategoryButton(cat)),
+                              _buildButton('My Booking', Icons.check_circle,
+                                  onTap: _navigateToMyRequest),
+                              _buildButton('Call Us', Icons.call,
+                                  onTap: _makePhoneCall),
+                              _buildButton(
+                                'Vendor Registration',
+                                Icons.person,
+                                onTap: _navigateToVendorReg,
+                              ),
+                            ],
+                          ),
+                        ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      onPressed: _openWhatsApp,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.chat, color: Colors.white),
+                          SizedBox(width: 10),
+                          Text('Chat with us',
+                              style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

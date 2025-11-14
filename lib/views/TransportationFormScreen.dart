@@ -402,7 +402,7 @@ class _TransportationFormScreenState extends State<TransportationFormScreen> {
                                   style: const TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: 14,
-                                    color: Colors.grey,
+                                    color: Colors.black,
                                   ),
                                   maxLines: 10,
                                   overflow: TextOverflow.ellipsis,

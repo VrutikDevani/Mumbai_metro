@@ -34,6 +34,13 @@ class _SignupViewState extends State<SignupView> {
   String? selectedState;
   bool isLoading = false;
 
+  clearField() {
+    nameController.clear();
+    emailController.clear();
+    pincodeController.clear();
+    cityController.clear();
+  }
+
   final List<String> indianStates = [
     'Andhra Pradesh',
     'Arunachal Pradesh',
@@ -173,6 +180,14 @@ class _SignupViewState extends State<SignupView> {
               mobileNo: widget.mobileNumber,
             );
             await prefs.setString('userData', jsonEncode(userData.toJson()));
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeServiceView(),
+              ),
+              (route) => false,
+            );
+            clearField();
             return true;
           }
         } else {
@@ -181,10 +196,27 @@ class _SignupViewState extends State<SignupView> {
         return false;
       } else {
         _showSnack(text: responseData['message'], isError: true);
+        if (responseData['message'] == 'Already registered. Please login.') {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginView(),
+            ),
+            (route) => false,
+          );
+        }
+        clearField();
         return false;
       }
     } catch (e) {
       log('[SignupView] ⚠️ JSON parsing error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Failed to create account. Please contact support at support@54kidsstreet.org.'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return false;
     }
   }
@@ -219,13 +251,13 @@ class _SignupViewState extends State<SignupView> {
         //   ),
         // );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Failed to create account. Please contact support at support@54kidsstreet.org.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //     content: Text(
+        //         'Failed to create account. Please contact support at support@54kidsstreet.org.'),
+        //     backgroundColor: Colors.red,
+        //   ),
+        // );
       }
     }
   }

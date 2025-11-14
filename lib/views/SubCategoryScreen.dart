@@ -706,7 +706,7 @@ class _ServiceFormScreenWithCoordinateState
                                   style: const TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: 14,
-                                    color: Colors.grey,
+                                    color: Colors.black,
                                   ),
                                   maxLines: 10,
                                   overflow: TextOverflow.ellipsis,
@@ -1028,7 +1028,7 @@ class _ServiceFormScreenWithCoordinateState
                       TextFormField(
                         controller: _notesController,
                         decoration: InputDecoration(
-                          labelText: 'Notes/Inventory',
+                          labelText: 'Notes/Instructions',
                           labelStyle: const TextStyle(color: darkBlue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -1416,7 +1416,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                                   style: const TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: 14,
-                                    color: Colors.grey,
+                                    color: Colors.black,
                                   ),
                                   maxLines: 10,
                                   overflow: TextOverflow.ellipsis,
@@ -1509,7 +1509,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                       TextFormField(
                         controller: _serviceDescriptionController,
                         decoration: InputDecoration(
-                          labelText: 'Notes',
+                          labelText: 'Notes/Instructions',
                           labelStyle: const TextStyle(color: darkBlue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),

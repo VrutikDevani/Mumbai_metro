@@ -62,7 +62,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Spacer(),
         Expanded(
             flex: 2,
             child: Text(
@@ -116,7 +115,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           : customerModel == null
               ? const Center(child: Text("No data found"))
               : ListView(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(18),
                   children: [
                     SizedBox(
                       height: 50,

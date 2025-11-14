@@ -6,8 +6,10 @@ import 'package:http/http.dart' as http;
 
 import 'package:new_packers_application/lib/constant/app_color.dart';
 import 'package:new_packers_application/lib/constant/app_strings.dart';
+import 'package:new_packers_application/lib/views/MyRequestScreen.dart';
 import 'package:new_packers_application/views/AppInfoScreen.dart';
 import 'package:new_packers_application/views/MyProfileScreen.dart';
+import 'package:new_packers_application/views/VendorRegScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../views/ACServicesScreen.dart' as AppColors;
@@ -70,6 +72,7 @@ class _AppDrawerState extends State<AppDrawer> {
 
   _buildButton({
     required String name,
+    required IconData icon,
     required void Function()? onTap,
   }) {
     return Padding(
@@ -85,14 +88,26 @@ class _AppDrawerState extends State<AppDrawer> {
               borderRadius: BorderRadius.circular(25),
             ),
           ),
-          child: Text(
-            name,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColor.whiteColor,
-              fontFamily: 'Poppins',
-            ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: Colors.white,
+              ),
+              SizedBox(width: 10,),
+              Expanded(
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.whiteColor,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -198,14 +213,41 @@ class _AppDrawerState extends State<AppDrawer> {
                   height: 30,
                 ),
                 _buildButton(
-                  name: AppStrings.privacy,
+                  icon: Icons.calendar_month_outlined,
+                  name: 'My Bookings',
+                  onTap: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    final String? customerId = prefs.getString('customerId');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyRequestScreen(
+                            customerId: int.parse(customerId ?? ''),
+                          ),
+                        ));
+                  },
+                ),
+                _buildButton(
+                  icon: Icons.business,
+                  name: 'Vendor Registration',
+                  onTap: () async {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VendorRegScreen(),
+                        ));
+                  },
+                ),
+                _buildButton(
+                  icon: Icons.call_to_action_sharp,
+                  name: AppStrings.aboutUs,
                   onTap: () {
                     if (privacyModel?.data != null) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => AppInfoScreen(
-                              policyItem: privacyModel!.data.privacyPolicy,
+                              policyItem: privacyModel!.data.aboutUs,
                             ),
                           ));
                     } else {
@@ -214,6 +256,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   },
                 ),
                 _buildButton(
+                  icon: Icons.quick_contacts_dialer_rounded,
                   name: AppStrings.term,
                   onTap: () {
                     if (privacyModel?.data != null) {
@@ -230,6 +273,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   },
                 ),
                 _buildButton(
+                  icon: Icons.find_in_page,
                   name: AppStrings.refund,
                   onTap: () {
                     if (privacyModel?.data != null) {
@@ -245,7 +289,9 @@ class _AppDrawerState extends State<AppDrawer> {
                     }
                   },
                 ),
+
                 _buildButton(
+                  icon: Icons.call,
                   name: AppStrings.contact,
                   onTap: () {
                     if (privacyModel?.data != null) {
@@ -261,15 +307,17 @@ class _AppDrawerState extends State<AppDrawer> {
                     }
                   },
                 ),
+
                 _buildButton(
-                  name: AppStrings.aboutUs,
+                  icon: Icons.privacy_tip_outlined,
+                  name: AppStrings.privacy,
                   onTap: () {
                     if (privacyModel?.data != null) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => AppInfoScreen(
-                              policyItem: privacyModel!.data.aboutUs,
+                              policyItem: privacyModel!.data.privacyPolicy,
                             ),
                           ));
                     } else {
@@ -277,6 +325,8 @@ class _AppDrawerState extends State<AppDrawer> {
                     }
                   },
                 ),
+
+
               ],
             ),
     );

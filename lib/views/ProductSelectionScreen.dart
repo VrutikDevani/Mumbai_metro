@@ -64,13 +64,14 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   void initState() {
     super.initState();
     _fetchProducts();
-    selectedProducts.addAll(widget.initialSelectedProducts.map((p) =>
-        SelectedProduct(productName: p.productName, count: p.count)));
+    selectedProducts.addAll(widget.initialSelectedProducts.map(
+        (p) => SelectedProduct(productName: p.productName, count: p.count)));
   }
 
   Future<void> _fetchProducts() async {
     try {
-      final String apiUrl = 'https://54kidsstreet.org/api/Product/${widget.serviceId}';
+      final String apiUrl =
+          'https://54kidsstreet.org/api/Product/${widget.serviceId}';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: {
@@ -84,7 +85,8 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
         if (jsonData['status'] == true) {
           final List<dynamic> productData = jsonData['data'];
           setState(() {
-            products = productData.map((data) => Product.fromJson(data)).toList();
+            products =
+                productData.map((data) => Product.fromJson(data)).toList();
             isLoading = false;
           });
         } else {
@@ -110,13 +112,14 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   void incrementProduct(String productName) {
     setState(() {
       final existingProduct = selectedProducts.firstWhere(
-            (p) => p.productName == productName,
+        (p) => p.productName == productName,
         orElse: () => SelectedProduct(productName: productName, count: 0),
       );
       if (selectedProducts.contains(existingProduct)) {
         existingProduct.count++;
       } else {
-        selectedProducts.add(SelectedProduct(productName: productName, count: 1));
+        selectedProducts
+            .add(SelectedProduct(productName: productName, count: 1));
       }
     });
   }
@@ -124,7 +127,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   void decrementProduct(String productName) {
     setState(() {
       final existingProduct = selectedProducts.firstWhere(
-            (p) => p.productName == productName,
+        (p) => p.productName == productName,
         orElse: () => SelectedProduct(productName: productName, count: 0),
       );
       if (existingProduct.count > 0) {
@@ -138,7 +141,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
 
   int getProductCount(String productName) {
     final existingProduct = selectedProducts.firstWhere(
-          (p) => p.productName == productName,
+      (p) => p.productName == productName,
       orElse: () => SelectedProduct(productName: productName, count: 0),
     );
     return existingProduct.count;
@@ -171,115 +174,164 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
         children: [
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator(color: darkBlue))
+                ? const Center(
+                    child: CircularProgressIndicator(color: darkBlue))
                 : errorMessage != null
-                ? Center(child: Text(errorMessage!, style: const TextStyle(color: darkBlue)))
-                : products.isEmpty
-                ? const Center(child: Text('No inventory available', style: TextStyle(color: darkBlue)))
-                : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                final currentCount = getProductCount(product.productName);
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12.0),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product.productName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Poppins',
+                    ? Center(
+                        child: Text(errorMessage!,
+                            style: const TextStyle(color: darkBlue)))
+                    : products.isEmpty
+                        ? const Center(
+                            child: Text('No inventory available',
+                                style: TextStyle(color: darkBlue)))
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(16.0),
+                            itemCount: products.length,
+                            itemBuilder: (context, index) {
+                              final product = products[index];
+                              final currentCount =
+                                  getProductCount(product.productName);
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        product.productName,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () => decrementProduct(
+                                              product.productName),
+                                          child: Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: lightBlue, width: 2),
+                                            ),
+                                            child: const Icon(Icons.remove,
+                                                color: lightBlue, size: 20),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.grey.shade100,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              currentCount.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        GestureDetector(
+                                          onTap: () => incrementProduct(
+                                              product.productName),
+                                          child: Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: lightBlue, width: 2),
+                                            ),
+                                            child: const Icon(Icons.add,
+                                                color: lightBlue, size: 20),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: darkBlue,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => decrementProduct(product.productName),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: lightBlue, width: 2),
-                              ),
-                              child: const Icon(Icons.remove, color: lightBlue, size: 20),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey.shade100,
-                            ),
-                            child: Center(
-                              child: Text(
-                                currentCount.toString(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          GestureDetector(
-                            onTap: () => incrementProduct(product.productName),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: lightBlue, width: 2),
-                              ),
-                              child: const Icon(Icons.add, color: lightBlue, size: 20),
-                            ),
-                          ),
-                        ],
+                      child: const Text(
+                        'Back',
+                        style: TextStyle(
+                          color: whiteColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context, selectedProducts);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: darkBlue,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Next',
-                  style: TextStyle(
-                    color: whiteColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context, selectedProducts);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: darkBlue,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Next',
+                        style: TextStyle(
+                          color: whiteColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

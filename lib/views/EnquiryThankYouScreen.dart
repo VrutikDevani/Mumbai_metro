@@ -455,44 +455,78 @@ class EnquiryThankYouScreen extends StatelessWidget {
               //   ),
               // ),
               // const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigator.of(context).pushAndRemoveUntil(
-                    //   MaterialPageRoute(
-                    //       builder: (context) => const HomeServiceView()),
-                    //   (Route<dynamic> route) => false,
-                    // );
-
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EnquiryBookingConfirmationWithAmount(
-                          enquiryResponse: enquiryResponse,
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                         Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: mediumBlue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        child: const Text(
+                          // 'Back to Home',
+                          'Back',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: whiteColor,
+                            fontFamily: 'Poppins',
+                          ),
                         ),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: mediumBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: const Text(
-                    // 'Back to Home',
-                    'Next',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: whiteColor,
-                      fontFamily: 'Poppins',
+                  SizedBox(width: 10,),
+                  Expanded(
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Navigator.of(context).pushAndRemoveUntil(
+                          //   MaterialPageRoute(
+                          //       builder: (context) => const HomeServiceView()),
+                          //   (Route<dynamic> route) => false,
+                          // );
+
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EnquiryBookingConfirmationWithAmount(
+                                enquiryResponse: enquiryResponse,
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: mediumBlue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        child: const Text(
+                          // 'Back to Home',
+                          'Next',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: whiteColor,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
