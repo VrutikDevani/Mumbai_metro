@@ -62,21 +62,20 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Text(
+          '${title} :',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColor.lightBlue,
+            fontFamily: 'Poppins',
+          ),
+        ),
         Expanded(
-            flex: 2,
-            child: Text(
-              '${title} :',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColor.lightBlue,
-                fontFamily: 'Poppins',
-              ),
-            )),
-        Expanded(
-          flex: 2,
+          flex: 1,
           child: Text(
             value,
+            textAlign: TextAlign.start,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
