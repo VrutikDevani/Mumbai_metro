@@ -147,7 +147,7 @@ class _EnquiryBookingConfirmationWithAmountState
                   ),
                   Expanded(
                     child: Text(
-                      'Includes door to door delivery with packing,transportation,loading & unloading.',
+                      'Includes Door to Door Delivery with Packing, Transportation, Loading & Unloading.',
                       style: const TextStyle(
                         fontSize: 14,
                         color: darkBlue,
@@ -251,7 +251,8 @@ class _EnquiryBookingConfirmationWithAmountState
                                 child: CircularProgressIndicator(),
                               )
                             : const Text(
-                                'Book Now',
+                                'Pay & Book Now',
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -352,12 +353,31 @@ class EnquiryThankYouScreen extends StatelessWidget {
                     const SizedBox(height: 15),
                     _buildDetailRow('Customer ID:',
                         enquiryResponse.data?.customerId ?? 'N/A'),
-                    _buildDetailRow('Order Number:',
+                    _buildDetailRow('Request Number:',
                         '#${enquiryResponse.data?.orderNo ?? 'N/A'}'),
                     _buildDetailRow('Pickup Location:',
                         enquiryResponse.data?.pickupLocation ?? 'N/A'),
+                    _buildDetailRow('Pickup Floor Number:',
+                        enquiryResponse.data?.floorNumber ?? 'N/A'),
+                    _buildDetailRow(
+                        'Pickup Service Lift:',
+                        (enquiryResponse.data?.pickupServicesLift ?? '0') == '0'
+                            ? 'Not Available'
+                            : 'Available'),
                     _buildDetailRow('Drop Location:',
                         enquiryResponse.data?.dropLocation ?? 'N/A'),
+                    if (enquiryResponse.data?.flatShopNo == 'NONE' &&
+                        enquiryResponse.data?.destinationFloorNumber != '') ...[
+                      _buildDetailRow(
+                          'Destination Floor Number:',
+                          enquiryResponse.data?.destinationFloorNumber ??
+                              'N/A'),
+                    ],
+                    _buildDetailRow(
+                        'Drop Service Lift:',
+                        (enquiryResponse.data?.dropServicesLift ?? '0') == '0'
+                            ? 'Not Available'
+                            : 'Available'),
                     if (enquiryResponse.data?.flatShopNo != 'NONE') ...[
                       _buildDetailRow(
                         'Flat/Shop No:',
@@ -374,22 +394,11 @@ class EnquiryThankYouScreen extends StatelessWidget {
                     ),
                     _buildDetailRow(
                       'Created Date:',
-                      AppFormatter.dateFormater(
-                          date: enquiryResponse.data?.createdAt ?? 'N/A'),
+                      AppFormatter.convertCreateDate(
+                          input: enquiryResponse.data?.createdAt ?? 'N/A'),
                     ),
-                    _buildDetailRow('Pickup Floor Number:',
-                        enquiryResponse.data?.floorNumber ?? 'N/A'),
-                    if (enquiryResponse.data?.flatShopNo == 'NONE' &&
-                        enquiryResponse.data?.destinationFloorNumber != '') ...[
-                      _buildDetailRow(
-                          'Destination Floor Number:',
-                          enquiryResponse.data?.destinationFloorNumber ??
-                              'N/A'),
-                    ],
-                    _buildDetailRow('Pickup Service Lift:',
-                        enquiryResponse.data?.pickupServicesLift ?? 'N/A'),
-                    _buildDetailRow('Drop Service Lift:',
-                        enquiryResponse.data?.dropServicesLift ?? 'N/A'),
+                    _buildDetailRow('Total KM: ',
+                        '${enquiryResponse.data?.distance ?? ''}'),
                   ],
                 ),
               ),

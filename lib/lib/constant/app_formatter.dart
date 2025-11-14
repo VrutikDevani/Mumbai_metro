@@ -24,7 +24,6 @@ class AppFormatter {
   }
 
   static String onlyTimeFormatter(String timeString) {
-
     try {
       DateTime time = DateFormat("hh:mm a").parse(timeString);
 
@@ -34,6 +33,20 @@ class AppFormatter {
     } catch (e) {
       log("❌ Error parsing time: $e");
       return '';
+    }
+  }
+
+  static String convertCreateDate({required String input}) {
+    try {
+      // Parse the incoming string
+      DateTime dateTime =
+          DateTime.parse(input); // handles Z, milliseconds automatically
+
+      // Format to your desired output
+      return DateFormat("dd-MM-yyyy hh:mm:ss a").format(dateTime);
+    } catch (e) {
+      log("Error parsing date: $e");
+      return input;
     }
   }
 }
