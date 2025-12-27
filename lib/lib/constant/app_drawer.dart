@@ -19,6 +19,7 @@ import '../models/app_policy_model.dart';
 
 class AppDrawer extends StatefulWidget {
   final PolicyModel? privacyModel;
+
   AppDrawer({super.key, this.privacyModel});
 
   @override
@@ -36,9 +37,11 @@ class _AppDrawerState extends State<AppDrawer> {
 
   bool isLoading = false;
   PolicyModel? privacyModel;
+
   getPolicy() {
     privacyModel = widget.privacyModel;
   }
+
   // fetchPolicy() async {
   //   if (privacyModel == null) {
   //     setState(() {
@@ -147,193 +150,194 @@ class _AppDrawerState extends State<AppDrawer> {
       backgroundColor: AppColor.whiteColor,
       child: isLoading
           ? Center(
-              child: SizedBox(
-                height: 30,
-                width: 30,
-                child: CircularProgressIndicator(
-                  color: AppColor.lightBlue,
-                ),
-              ),
-            )
-          : Column(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).padding.top + 20,
-                ),
-                SizedBox(height: 30),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10000),
-                  child: Image.asset(
-                    'assets/applogo.jpeg',
-                    height: 120,
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "MUMBAI METRO",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColor.darkBlue,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-                Text(
-                  "PACKERS AND MOVERS",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColor.darkBlue,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                _buildButton(
-                  icon: Icons.person,
-                  name: 'My Profile',
-                  onTap: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    final String? customerId = prefs.getString('customerId');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MyProfileScreen(customerId: customerId ?? ''),
-                        ));
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.calendar_month_outlined,
-                  name: 'My Bookings',
-                  onTap: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    final String? customerId = prefs.getString('customerId');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MyRequestScreen(
-                            customerId: int.parse(customerId ?? ''),
-                          ),
-                        ));
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.calendar_month_outlined,
-                  name: 'Payment Details',
-                  onTap: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PaymentDetailsScreen(),
-                        ));
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.business,
-                  name: 'Vendor Registration',
-                  onTap: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VendorRegScreen(),
-                        ));
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.call_to_action_sharp,
-                  name: AppStrings.aboutUs,
-                  onTap: () {
-                    if (privacyModel?.data != null) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            // Note: Assuming AboutUsModel is assignable to PolicyItem for AppInfoScreen
-                            builder: (context) => AppInfoScreen(
-                              policyItem: privacyModel!.data.aboutUs,
-                            ),
-                          ));
-                    } else {
-                      _showSnack(text: 'Something went wrong', isError: true);
-                    }
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.quick_contacts_dialer_rounded,
-                  name: AppStrings.term,
-                  onTap: () {
-                    if (privacyModel?.data != null) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AppInfoScreen(
-                              policyItem: privacyModel!.data.termsCondition,
-                            ),
-                          ));
-                    } else {
-                      _showSnack(text: 'Something went wrong', isError: true);
-                    }
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.find_in_page,
-                  name: AppStrings.refund,
-                  onTap: () {
-                    if (privacyModel?.data != null) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AppInfoScreen(
-                              policyItem: privacyModel!.data.refundPolicy,
-                            ),
-                          ));
-                    } else {
-                      _showSnack(text: 'Something went wrong', isError: true);
-                    }
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.call,
-                  name: AppStrings.contact,
-                  onTap: () {
-                    if (privacyModel?.data != null) {
-                      // *** UPDATED TO USE THE DEDICATED CONTACTUSSCREEN ***
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ContactUsScreen(
-                              contactData: privacyModel!.data.contactUs,
-                            ),
-                          ));
-                    } else {
-                      _showSnack(text: 'Something went wrong', isError: true);
-                    }
-                  },
-                ),
-                _buildButton(
-                  icon: Icons.privacy_tip_outlined,
-                  name: AppStrings.privacy,
-                  onTap: () {
-                    if (privacyModel?.data != null) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AppInfoScreen(
-                              policyItem: privacyModel!.data.privacyPolicy,
-                            ),
-                          ));
-                    } else {
-                      _showSnack(text: 'Something went wrong', isError: true);
-                    }
-                  },
-                ),
-              ],
+        child: SizedBox(
+          height: 30,
+          width: 30,
+          child: CircularProgressIndicator(
+            color: AppColor.lightBlue,
+          ),
+        ),
+      )
+          : ListView(
+        physics: BouncingScrollPhysics(),
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).padding.top + 20,
+          ),
+          SizedBox(height: 30),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10000),
+            child: Image.asset(
+              'assets/applogo.jpeg',
+              height: 120,
             ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "MUMBAI METRO",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColor.darkBlue,
+              fontFamily: 'Poppins',
+            ),
+          ),
+          Text(
+            "PACKERS AND MOVERS",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: AppColor.darkBlue,
+              fontFamily: 'Poppins',
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          _buildButton(
+            icon: Icons.person,
+            name: 'My Profile',
+            onTap: () async {
+              final prefs = await SharedPreferences.getInstance();
+              final String? customerId = prefs.getString('customerId');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MyProfileScreen(customerId: customerId ?? ''),
+                  ));
+            },
+          ),
+          _buildButton(
+            icon: Icons.calendar_month_outlined,
+            name: 'My Bookings',
+            onTap: () async {
+              final prefs = await SharedPreferences.getInstance();
+              final String? customerId = prefs.getString('customerId');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyRequestScreen(
+                      customerId: int.parse(customerId ?? ''),
+                    ),
+                  ));
+            },
+          ),
+          _buildButton(
+            icon: Icons.calendar_month_outlined,
+            name: 'Payment Details',
+            onTap: () async {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentDetailsScreen(),
+                  ));
+            },
+          ),
+          _buildButton(
+            icon: Icons.business,
+            name: 'Vendor Registration',
+            onTap: () async {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VendorRegScreen(),
+                  ));
+            },
+          ),
+          _buildButton(
+            icon: Icons.call_to_action_sharp,
+            name: AppStrings.aboutUs,
+            onTap: () {
+              if (privacyModel?.data != null) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      // Note: Assuming AboutUsModel is assignable to PolicyItem for AppInfoScreen
+                      builder: (context) => AppInfoScreen(
+                        policyItem: privacyModel!.data.aboutUs,
+                      ),
+                    ));
+              } else {
+                _showSnack(text: 'Something went wrong', isError: true);
+              }
+            },
+          ),
+          _buildButton(
+            icon: Icons.quick_contacts_dialer_rounded,
+            name: AppStrings.term,
+            onTap: () {
+              if (privacyModel?.data != null) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppInfoScreen(
+                        policyItem: privacyModel!.data.termsCondition,
+                      ),
+                    ));
+              } else {
+                _showSnack(text: 'Something went wrong', isError: true);
+              }
+            },
+          ),
+          _buildButton(
+            icon: Icons.find_in_page,
+            name: AppStrings.refund,
+            onTap: () {
+              if (privacyModel?.data != null) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppInfoScreen(
+                        policyItem: privacyModel!.data.refundPolicy,
+                      ),
+                    ));
+              } else {
+                _showSnack(text: 'Something went wrong', isError: true);
+              }
+            },
+          ),
+          _buildButton(
+            icon: Icons.call,
+            name: AppStrings.contact,
+            onTap: () {
+              if (privacyModel?.data != null) {
+                // *** UPDATED TO USE THE DEDICATED CONTACTUSSCREEN ***
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ContactUsScreen(
+                        contactData: privacyModel!.data.contactUs,
+                      ),
+                    ));
+              } else {
+                _showSnack(text: 'Something went wrong', isError: true);
+              }
+            },
+          ),
+          _buildButton(
+            icon: Icons.privacy_tip_outlined,
+            name: AppStrings.privacy,
+            onTap: () {
+              if (privacyModel?.data != null) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppInfoScreen(
+                        policyItem: privacyModel!.data.privacyPolicy,
+                      ),
+                    ));
+              } else {
+                _showSnack(text: 'Something went wrong', isError: true);
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }

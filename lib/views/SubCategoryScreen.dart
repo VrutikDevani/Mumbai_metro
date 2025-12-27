@@ -131,9 +131,9 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
 
   Widget _buildSubCategoryButton(SubCategory subCategory) {
     String? imageUrl = subCategory.subCateIconImage != '' &&
-            subCategory.subCateIconImage.isNotEmpty
+        subCategory.subCateIconImage.isNotEmpty
         ? AppStrings.subcategoryIconImage(
-            iconImage: subCategory.subCateIconImage)
+        iconImage: subCategory.subCateIconImage)
         : null;
     IconData defaultIcon = Icons.category;
 
@@ -245,36 +245,36 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                 Center(
                     child: imageUrl != null && imageUrl.isNotEmpty
                         ? SizedBox(
-                            height: 40,
-                            width: 40,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: FadeInImage.assetNetwork(
-                                placeholder: 'assets/parcelwala4.jpg',
-                                image: imageUrl,
-                                fit: BoxFit.fill,
-                                alignment: Alignment.center,
-                                imageErrorBuilder:
-                                    (context, error, stackTrace) {
-                                  return Icon(defaultIcon,
-                                      color: mediumBlue, size: 28);
-                                },
-                              ),
-                            ),
-                          )
-                        // : Icon(defaultIcon, color: AppColor.whiteColor, size: 28),
+                      height: 40,
+                      width: 40,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: FadeInImage.assetNetwork(
+                          placeholder: 'assets/applogo2.jpg',
+                          image: imageUrl,
+                          fit: BoxFit.fill,
+                          alignment: Alignment.center,
+                          imageErrorBuilder:
+                              (context, error, stackTrace) {
+                            return Icon(defaultIcon,
+                                color: mediumBlue, size: 28);
+                          },
+                        ),
+                      ),
+                    )
+                    // : Icon(defaultIcon, color: AppColor.whiteColor, size: 28),
                         : SizedBox(
-                            height: 40,
-                            width: 40,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
-                                'assets/parcelwala4.jpg',
-                                fit: BoxFit.fill,
-                                alignment: Alignment.center,
-                              ),
-                            ),
-                          )),
+                      height: 40,
+                      width: 40,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          'assets/applogo2.jpg',
+                          fit: BoxFit.fill,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                    )),
                 Expanded(
                   child: Text(
                     subCategory.subCategoryName,
@@ -320,23 +320,23 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
           child: isLoading
               ? const Center(child: CircularProgressIndicator(color: darkBlue))
               : errorMessage != null
-                  ? Center(
-                      child: Text(
-                        errorMessage!,
-                        style: const TextStyle(color: darkBlue),
-                      ),
-                    )
-                  : subCategories.isEmpty
-                      ? const Center(
-                          child: Text('No subcategories available',
-                              style: TextStyle(color: darkBlue)))
-                      : ListView.builder(
-                          itemCount: subCategories.length,
-                          itemBuilder: (context, index) {
-                            final subCategory = subCategories[index];
-                            return _buildSubCategoryButton(subCategory);
-                          },
-                        ),
+              ? Center(
+            child: Text(
+              errorMessage!,
+              style: const TextStyle(color: darkBlue),
+            ),
+          )
+              : subCategories.isEmpty
+              ? const Center(
+              child: Text('No subcategories available',
+                  style: TextStyle(color: darkBlue)))
+              : ListView.builder(
+            itemCount: subCategories.length,
+            itemBuilder: (context, index) {
+              final subCategory = subCategories[index];
+              return _buildSubCategoryButton(subCategory);
+            },
+          ),
         ),
       ),
     );
@@ -476,7 +476,7 @@ class _ServiceFormScreenWithCoordinateState
       String pickupHouse = _pickupHouseNoController.text.trim();
       String pickupArea = _pickupLocationController.text.trim();
       String fullPickupAddress =
-          pickupHouse.isNotEmpty ? "$pickupHouse, $pickupArea" : pickupArea;
+      pickupHouse.isNotEmpty ? "$pickupHouse, $pickupArea" : pickupArea;
 
       String destArea = _destinationLocationController.text.trim();
       String fullDestAddress = destArea;
@@ -503,15 +503,15 @@ class _ServiceFormScreenWithCoordinateState
       }
 
       request.fields['shipping_date_time'] =
-          _selectedDate != null && selectedTime != ''
-              ? '${DateFormat('yyyy-MM-dd').format(
-                  DateTime(
-                    _selectedDate!.year,
-                    _selectedDate!.month,
-                    _selectedDate!.day,
-                  ),
-                )} ${AppFormatter.onlyTimeFormatter(selectedTime)}'
-              : '';
+      _selectedDate != null && selectedTime != ''
+          ? '${DateFormat('yyyy-MM-dd').format(
+        DateTime(
+          _selectedDate!.year,
+          _selectedDate!.month,
+          _selectedDate!.day,
+        ),
+      )} ${AppFormatter.onlyTimeFormatter(selectedTime)}'
+          : '';
 
       request.fields['vehicle_model'] = 'NONE';
 
@@ -572,7 +572,7 @@ class _ServiceFormScreenWithCoordinateState
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content:
-                    Text(response?.msg ?? 'Failed to submit service request'),
+                Text(response?.msg ?? 'Failed to submit service request'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -676,7 +676,7 @@ class _ServiceFormScreenWithCoordinateState
                                       placeholder: 'assets/parcelwala4.jpg',
                                       image: AppStrings.subcategoryBannerImage(
                                         bannerImage:
-                                            widget.subCategoryBanner ?? '',
+                                        widget.subCategoryBanner ?? '',
                                       ),
                                       fit: BoxFit.cover,
                                       imageErrorBuilder:
@@ -800,7 +800,7 @@ class _ServiceFormScreenWithCoordinateState
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                        const BorderSide(color: mediumBlue),
+                                    const BorderSide(color: mediumBlue),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
@@ -808,7 +808,7 @@ class _ServiceFormScreenWithCoordinateState
                                   _selectedDate == null
                                       ? 'Select date'
                                       : DateFormat('dd/MM/yyyy')
-                                          .format(_selectedDate!),
+                                      .format(_selectedDate!),
                                   style: TextStyle(
                                     color: _selectedDate == null
                                         ? Colors.grey
@@ -857,7 +857,7 @@ class _ServiceFormScreenWithCoordinateState
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide:
-                                      const BorderSide(color: Colors.grey),
+                                  const BorderSide(color: Colors.grey),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 10),
@@ -1096,17 +1096,17 @@ class _ServiceFormScreenWithCoordinateState
                   ),
                   child: _isSubmitting
                       ? const CircularProgressIndicator(
-                          color: whiteColor,
-                          strokeWidth: 2,
-                        )
+                    color: whiteColor,
+                    strokeWidth: 2,
+                  )
                       : const Text(
-                          'Submit',
-                          style: TextStyle(
-                            color: whiteColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                    'Submit',
+                    style: TextStyle(
+                      color: whiteColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1189,9 +1189,9 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
       request.fields['customer_id'] = widget.customerId?.toString() ?? '0';
       request.fields['service_name'] = widget.subCategoryName;
       request.fields['service_description'] =
-          _serviceDescriptionController.text.isNotEmpty
-              ? _serviceDescriptionController.text.trim()
-              : 'NONE';
+      _serviceDescriptionController.text.isNotEmpty
+          ? _serviceDescriptionController.text.trim()
+          : 'NONE';
       String houseNo = _flatNumberController.text.trim();
       String area = _serviceLocationController.text.trim();
       String fullAddress = houseNo.isNotEmpty ? "$houseNo, $area" : area;
@@ -1272,7 +1272,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content:
-                  Text(response?.msg ?? 'Failed to submit service request'),
+              Text(response?.msg ?? 'Failed to submit service request'),
               backgroundColor: Colors.red,
             ),
           );
@@ -1396,8 +1396,8 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                                       placeholder: 'assets/parcelwala4.jpg',
                                       image: AppStrings.subcategoryBannerImage(
                                           bannerImage:
-                                              widget.subCategoryBannerImg ??
-                                                  ''),
+                                          widget.subCategoryBannerImg ??
+                                              ''),
                                       fit: BoxFit.cover,
                                       imageErrorBuilder:
                                           (context, error, stackTrace) {
@@ -1530,7 +1530,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                             _selectedDate == null
                                 ? 'Select a date'
                                 : DateFormat('dd-MM-yyyy')
-                                    .format(_selectedDate!),
+                                .format(_selectedDate!),
                             style: const TextStyle(color: darkBlue),
                           ),
                         ),
@@ -1586,17 +1586,17 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                   ),
                   child: _isSubmitting
                       ? const CircularProgressIndicator(
-                          color: whiteColor,
-                          strokeWidth: 2,
-                        )
+                    color: whiteColor,
+                    strokeWidth: 2,
+                  )
                       : const Text(
-                          'Submit',
-                          style: TextStyle(
-                            color: whiteColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                    'Submit',
+                    style: TextStyle(
+                      color: whiteColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
