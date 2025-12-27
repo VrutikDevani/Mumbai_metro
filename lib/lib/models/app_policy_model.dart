@@ -51,6 +51,14 @@ class ContactUsModel {
   final String youtube;
   final String address;
   final String email2;
+  final String facebookIcon;
+  final String instagramIcon;
+  final String twitterIcon;
+  final String linkedinIcon;
+  final String youtubeIcon;
+  final String mapLocationLink;
+  final String shareAppLink;
+  final String websiteLink;
 
   ContactUsModel({
     required this.title,
@@ -65,6 +73,14 @@ class ContactUsModel {
     required this.youtube,
     required this.address,
     required this.email2,
+    required this.facebookIcon,
+    required this.instagramIcon,
+    required this.twitterIcon,
+    required this.linkedinIcon,
+    required this.youtubeIcon,
+    required this.mapLocationLink,
+    required this.shareAppLink,
+    required this.websiteLink,
   });
 
   factory ContactUsModel.fromJson(Map<String, dynamic> json) {
@@ -81,6 +97,14 @@ class ContactUsModel {
       youtube: json['youtube'] ?? '',
       address: json['address'] ?? '',
       email2: json['email2'] ?? '',
+      facebookIcon: json['facebook_icon'] ?? '',
+      instagramIcon: json['instagram_icon'] ?? '',
+      twitterIcon: json['twitter_icon'] ?? '',
+      linkedinIcon: json['linkedin_icon'] ?? '',
+      youtubeIcon: json['youtube_icon'] ?? '',
+      mapLocationLink: json['map_location_link'] ?? '',
+      shareAppLink: json['share_app_link'] ?? '',
+      websiteLink: json['website_link'] ?? '',
     );
   }
 }
@@ -92,7 +116,8 @@ class PolicyData {
   final PolicyItem termsCondition;
   final PolicyItem refundPolicy;
   final ContactUsModel contactUs; // Changed from PolicyItem to ContactUsModel
-  final PolicyItem aboutUs;     // Changed from PolicyItem to AboutUsModel
+  final PolicyItem aboutUs; // Changed from PolicyItem to AboutUsModel
+  final HomePageModel homePage;
 
   PolicyData({
     required this.privacyPolicy,
@@ -100,6 +125,7 @@ class PolicyData {
     required this.refundPolicy,
     required this.contactUs,
     required this.aboutUs,
+    required this.homePage,
   });
 
   factory PolicyData.fromJson(Map<String, dynamic> json) {
@@ -110,6 +136,25 @@ class PolicyData {
       // Map to the new specialized models
       contactUs: ContactUsModel.fromJson(json['contact_us'] ?? {}),
       aboutUs: PolicyItem.fromJson(json['about_us'] ?? {}),
+      homePage: HomePageModel.fromJson(json['home-page'] ?? {}),
+    );
+  }
+}
+
+// --- 6. HomePageModel (New) ---
+class HomePageModel {
+  final String chatNumber;
+  final String callNumber;
+
+  HomePageModel({
+    required this.chatNumber,
+    required this.callNumber,
+  });
+
+  factory HomePageModel.fromJson(Map<String, dynamic> json) {
+    return HomePageModel(
+      chatNumber: json['chat_number'] ?? '',
+      callNumber: json['call_number'] ?? '',
     );
   }
 }

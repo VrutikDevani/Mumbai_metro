@@ -364,10 +364,9 @@ class ThankYouScreen extends StatelessWidget {
                             serviceResponse.data?.vehicleDetails ?? 'N/A')
                         : SizedBox(),
                     if (serviceResponse.data?.notes != null &&
-                        serviceResponse.data?.notes !=
-                            '') ...[
-                      _buildDetailRow('Notes:',
-                          serviceResponse.data?.notes ?? 'N/A'),
+                        serviceResponse.data?.notes != '') ...[
+                      _buildDetailRow(
+                          'Notes:', serviceResponse.data?.notes ?? 'N/A'),
                     ],
                     _buildDetailRow(
                       'Service Date:',

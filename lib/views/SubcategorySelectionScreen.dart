@@ -78,7 +78,8 @@ class Product {
   }
 }
 
-class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen> {
+class _SubCategorySelectionScreenState
+    extends State<SubCategorySelectionScreen> {
   List<ProductSubcategory> subcategories = []; // List to hold subcategories
   List<Product> products = [];
   bool isLoadingSubcategories = true; // Loading state for subcategories
@@ -91,10 +92,13 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
   void initState() {
     super.initState();
     _fetchProductSubcategories(); // Fetch subcategories first
-    selectedProducts.addAll(widget.initialSelectedProducts
-        .map((p) => SelectedProduct(productName: p.productName, count: p.count)));
-
-
+    selectedProducts.addAll(widget.initialSelectedProducts.map((p) =>
+        SelectedProduct(
+            productName: p.productName,
+            count: p.count,
+            productId: p.productId,
+            serviceId: p.serviceId,
+            productSubCatId: p.productSubCatId)));
   }
 
   // Fetches product subcategories based on the service ID.
@@ -133,8 +137,7 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
         }
       } else {
         setState(() {
-          errorMessage =
-          'Failed to load subcategories: ${response.statusCode}';
+          errorMessage = 'Failed to load subcategories: ${response.statusCode}';
           isLoadingSubcategories = false;
         });
       }
@@ -194,40 +197,65 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
     }
   }
 
-  void incrementProduct(String productName) {
+  void incrementProduct(Product product) {
     setState(() {
       final existingProduct = selectedProducts.firstWhere(
-            (p) => p.productName == productName,
-        orElse: () => SelectedProduct(productName: productName, count: 0),
+        (p) => p.productId == product.productId,
+        orElse: () => SelectedProduct(
+          productName: product.productName,
+          count: 0,
+          productId: product.productId,
+          serviceId: product.serviceId,
+          productSubCatId: selectedSubcategory!.subcatId,
+        ),
       );
       if (selectedProducts.contains(existingProduct)) {
         existingProduct.count++;
       } else {
-        selectedProducts
-            .add(SelectedProduct(productName: productName, count: 1));
+        selectedProducts.add(
+          SelectedProduct(
+            productName: product.productName,
+            count: 1,
+            productId: product.productId,
+            serviceId: product.serviceId,
+            productSubCatId: selectedSubcategory!.subcatId,
+          ),
+        );
       }
     });
   }
 
-  void decrementProduct(String productName) {
+  void decrementProduct(Product product) {
     setState(() {
       final existingProduct = selectedProducts.firstWhere(
-            (p) => p.productName == productName,
-        orElse: () => SelectedProduct(productName: productName, count: 0),
+        (p) => p.productId == product.productId,
+        orElse: () => SelectedProduct(
+          productName: product.productName,
+          count: 0,
+          productId: product.productId,
+          serviceId: product.serviceId,
+          productSubCatId: selectedSubcategory!.subcatId,
+        ),
       );
       if (existingProduct.count > 0) {
         existingProduct.count--;
         if (existingProduct.count == 0) {
-          selectedProducts.removeWhere((p) => p.productName == productName);
+          selectedProducts.removeWhere((p) => p.productId == product.productId);
         }
       }
     });
   }
 
-  int getProductCount(String productName) {
+  int getProductCount(Product product) {
     final existingProduct = selectedProducts.firstWhere(
-          (p) => p.productName == productName,
-      orElse: () => SelectedProduct(productName: productName, count: 0),
+      (p) => p.productId == product.productId,
+      orElse: () => SelectedProduct(
+        productName: product.productName,
+        count: 0,
+        productId: product.productId,
+        serviceId: product.serviceId,
+        productSubCatId: selectedSubcategory!.subcatId,
+      ),
     );
     return existingProduct.count;
   }
@@ -260,7 +288,8 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
         children: [
           // Subcategory Section
           if (isLoadingSubcategories)
-            const Center(child: Padding(
+            const Center(
+                child: Padding(
               padding: EdgeInsets.all(16.0),
               child: CircularProgressIndicator(color: darkBlue),
             ))
@@ -284,7 +313,11 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
                     spacing: 8.0,
                     runSpacing: 8.0,
                     children: subcategories.map((subcat) {
-                      final isSelected = selectedSubcategory?.subcatId == subcat.subcatId;
+                      final isSelected =
+                          selectedSubcategory?.subcatId == subcat.subcatId;
+                      final hasItems = selectedProducts.any((p) =>
+                          p.productSubCatId == subcat.subcatId && p.count > 0);
+
                       return ChoiceChip(
                         label: Text(subcat.subcatName),
                         selected: isSelected,
@@ -296,14 +329,29 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
                             _fetchProducts(subcat.subcatId);
                           }
                         },
-                        backgroundColor: isSelected ? darkBlue : Colors.grey.shade200,
+                        backgroundColor: isSelected
+                            ? darkBlue
+                            : (hasItems
+                                ? const Color.fromARGB(255, 203, 135, 121)
+                                : Colors.grey.shade200),
                         labelStyle: TextStyle(
-                          color: isSelected ? blackColor : darkBlue,
+                          color: isSelected
+                              ? const Color.fromARGB(255, 30, 23, 23)
+                              : (hasItems
+                                  ? const Color.fromARGB(255, 35, 11, 11)
+                                  : darkBlue),
                           fontFamily: 'Poppins',
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: isSelected ? darkBlue : Colors.grey.shade400),
+                          side: hasItems
+                              ? const BorderSide(
+                                  color: Color.fromARGB(255, 212, 67, 45),
+                                  width: 2)
+                              : BorderSide(
+                                  color: isSelected
+                                      ? darkBlue
+                                      : Colors.grey.shade400),
                         ),
                       );
                     }).toList(),
@@ -318,104 +366,113 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
           // Products Section
           Expanded(
             child: isLoadingProducts
-                ? const Center(child: CircularProgressIndicator(color: darkBlue))
+                ? const Center(
+                    child: CircularProgressIndicator(color: darkBlue))
                 : errorMessage != null
-                ? Center(child: Text(errorMessage!, style: const TextStyle(color: darkBlue)))
-                : selectedSubcategory == null
-                ? const Center(child: Text('Please select a subcategory to see products', style: TextStyle(color: darkBlue)))
-                : products.isEmpty
-                ? const Center(child: Text('No inventory available for this subcategory', style: TextStyle(color: darkBlue)))
-                : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                final currentCount = getProductCount(product.productName);
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12.0),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product.productName,
-                          style: const TextStyle(fontSize: 16, fontFamily: 'Poppins'),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => decrementProduct(product.productName),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: lightBlue, width: 2),
+                    ? Center(
+                        child: Text(errorMessage!,
+                            style: const TextStyle(color: darkBlue)))
+                    : selectedSubcategory == null
+                        ? const Center(
+                            child: Text(
+                                'Please select a subcategory to see products',
+                                style: TextStyle(color: darkBlue)))
+                        : products.isEmpty
+                            ? const Center(
+                                child: Text(
+                                    'No inventory available for this subcategory',
+                                    style: TextStyle(color: darkBlue)))
+                            : ListView.builder(
+                                padding: const EdgeInsets.all(16.0),
+                                itemCount: products.length,
+                                itemBuilder: (context, index) {
+                                  final product = products[index];
+                                  final currentCount = getProductCount(product);
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 12.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            product.productName,
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'Poppins'),
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () =>
+                                                  decrementProduct(product),
+                                              child: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                      color: lightBlue,
+                                                      width: 2),
+                                                ),
+                                                child: const Icon(Icons.remove,
+                                                    color: lightBlue, size: 20),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.grey.shade100,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  currentCount.toString(),
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            GestureDetector(
+                                              onTap: () =>
+                                                  incrementProduct(product),
+                                              child: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                      color: lightBlue,
+                                                      width: 2),
+                                                ),
+                                                child: const Icon(Icons.add,
+                                                    color: lightBlue, size: 20),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
-                              child: const Icon(Icons.remove, color: lightBlue, size: 20),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey.shade100,
-                            ),
-                            child: Center(
-                              child: Text(
-                                currentCount.toString(),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          GestureDetector(
-                            onTap: () => incrementProduct(product.productName),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: lightBlue, width: 2),
-                              ),
-                              child: const Icon(Icons.add, color: lightBlue, size: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
           ),
           Row(
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade600,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: const Text('Back', style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
@@ -426,9 +483,14 @@ class _SubCategorySelectionScreenState extends State<SubCategorySelectionScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: darkBlue,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text('Next', style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: const Text('Next',
+                        style: TextStyle(
+                            color: whiteColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
                   ),
                 ),
               ),

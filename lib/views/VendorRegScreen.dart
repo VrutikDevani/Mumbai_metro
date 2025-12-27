@@ -95,7 +95,8 @@ class _VendorRegScreenState extends State<VendorRegScreen> {
           if (jsonResponse['status'] == true) {
             log('✅ Success: ${jsonResponse['message']}');
             _showSnack(
-                text: 'Your details has been successfully submitted', isError: false);
+                text: 'Your details has been successfully submitted',
+                isError: false);
             Navigator.pop(context);
           } else {
             log('⚠️ Failed: ${jsonResponse['message']}');
@@ -104,7 +105,8 @@ class _VendorRegScreenState extends State<VendorRegScreen> {
         } else {
           log('❌ Server Error: ${response.statusCode}');
           _showSnack(
-              text: 'Server Error: ${response.statusCode},${response.body}', isError: true);
+              text: 'Server Error: ${response.statusCode},${response.body}',
+              isError: true);
         }
       } catch (e) {
         log('🚨 Exception: $e');
@@ -153,7 +155,19 @@ class _VendorRegScreenState extends State<VendorRegScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 30,
+                  height: 20,
+                ),
+                Text(
+                  "Fill in the below details, vendor registration (partners)",
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.darkBlue,
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
                 ),
                 TextFormField(
                   controller: fullName,

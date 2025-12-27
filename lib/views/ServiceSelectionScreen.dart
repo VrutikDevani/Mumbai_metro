@@ -110,6 +110,7 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
   }
 
   bool _isSubmitting = false;
+  int? _submittedEnquiryId;
 
   void _updateServiceCount(int serviceId, List<SelectedProduct> products) {
     serviceSelectedProducts[serviceId] = products;
@@ -127,6 +128,12 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
       final product = selectedItems[i];
       productsMap['products_item[$i][product_name]'] = product.productName;
       productsMap['products_item[$i][quantity]'] = product.count.toString();
+      productsMap['products_item[$i][product_id]'] =
+          product.productId?.toString() ?? '0';
+      productsMap['products_item[$i][service_id]'] =
+          product.serviceId?.toString() ?? '0';
+      productsMap['products_item[$i][product_subcat_id]'] =
+          product.productSubCatId?.toString() ?? '0';
     }
 
     return productsMap;
@@ -137,73 +144,112 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
     return "$floor";
   }
 
+  void _populateRequestFields(
+      http.MultipartRequest request, List<SelectedProduct> selectedItems) {
+    request.fields['customer_id'] =
+        widget.shiftData?.customerId?.toString() ?? '0';
+    request.fields['pickup_location'] = widget.shiftData?.sourceAddress ?? '';
+    request.fields['drop_location'] =
+        widget.shiftData?.destinationAddress ?? '';
+    // request.fields['flat_shop_no'] = '${widget.shiftData?.floorSource}F';
+    request.fields['flat_shop_no'] = 'NONE';
+    request.fields['shipping_date_time'] =
+        '${widget.shiftData?.selectedDate} ${widget.shiftData?.selectedTime}';
+    request.fields['floor_number'] =
+        /*_formatFloorNumber(widget.shiftData.floorSource);*/
+        widget.shiftData!.floorSource.toString();
+    request.fields['pickup_services_lift'] =
+        /*widget.shiftData.serviceLiftSource ? 'YES' : 'NO'*/
+        widget.shiftData!.serviceLiftSource ? '1' : '0';
+    request.fields['drop_services_lift'] =
+        /*widget.shiftData.serviceLiftDestination ? 'YES' : 'NO'*/
+        widget.shiftData!.serviceLiftDestination ? '1' : '0';
+    request.fields.addAll(_formatProductsForAPI(selectedItems: selectedItems));
+    request.fields['km_distance'] = '0';
+
+    if (widget.shiftData!.sourceCoordinates != null) {
+      request.fields['pickup_latitude'] =
+          widget.shiftData!.sourceCoordinates!.latitude.toString();
+      request.fields['pickup_longitude'] =
+          widget.shiftData!.sourceCoordinates!.longitude.toString();
+    }
+
+    if (widget.shiftData!.destinationCoordinates != null) {
+      request.fields['drop_latitude'] =
+          widget.shiftData!.destinationCoordinates!.latitude.toString();
+      request.fields['drop_longitude'] =
+          widget.shiftData!.destinationCoordinates!.longitude.toString();
+    }
+    if (widget.shiftData!.floorDestination != null) {
+      request.fields['destination_floor_number'] =
+          widget.shiftData!.floorDestination.toString();
+    }
+
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'Content-Type': 'multipart/form-data',
+    });
+  }
+
   Future<EnquiryResponse?> _submitEnquiry(
       {required List<SelectedProduct> selectedItems}) async {
     try {
       const String apiUrl = 'https://54kidsstreet.org/api/enquiry';
 
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-
-      request.fields['customer_id'] =
-          widget.shiftData?.customerId?.toString() ?? '0';
-      request.fields['pickup_location'] = widget.shiftData?.sourceAddress ?? '';
-      request.fields['drop_location'] =
-          widget.shiftData?.destinationAddress ?? '';
-      // request.fields['flat_shop_no'] = '${widget.shiftData?.floorSource}F';
-      request.fields['flat_shop_no'] = 'NONE';
-      request.fields['shipping_date_time'] =
-          '${widget.shiftData?.selectedDate} ${widget.shiftData?.selectedTime}';
-      request.fields['floor_number'] =
-          /*_formatFloorNumber(widget.shiftData.floorSource);*/
-          widget.shiftData!.floorSource.toString();
-      request.fields['pickup_services_lift'] =
-          /*widget.shiftData.serviceLiftSource ? 'YES' : 'NO'*/
-          widget.shiftData!.serviceLiftSource ? '1' : '0';
-      request.fields['drop_services_lift'] =
-          /*widget.shiftData.serviceLiftDestination ? 'YES' : 'NO'*/
-          widget.shiftData!.serviceLiftDestination ? '1' : '0';
-      request.fields
-          .addAll(_formatProductsForAPI(selectedItems: selectedItems));
-      request.fields['km_distance'] = '0';
-
-      if (widget.shiftData!.sourceCoordinates != null) {
-        request.fields['pickup_latitude'] =
-            widget.shiftData!.sourceCoordinates!.latitude.toString();
-        request.fields['pickup_longitude'] =
-            widget.shiftData!.sourceCoordinates!.longitude.toString();
-      }
-
-      if (widget.shiftData!.destinationCoordinates != null) {
-        request.fields['drop_latitude'] =
-            widget.shiftData!.destinationCoordinates!.latitude.toString();
-        request.fields['drop_longitude'] =
-            widget.shiftData!.destinationCoordinates!.longitude.toString();
-      }
-      if (widget.shiftData!.floorDestination != null) {
-        request.fields['destination_floor_number'] =
-            widget.shiftData!.floorDestination.toString();
-      }
-
-
-      request.headers.addAll({
-        'Accept': 'application/json',
-        'Content-Type': 'multipart/form-data',
-      });
+      _populateRequestFields(request, selectedItems);
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonData = json.decode(response.body);
-        print('Res---->>${response.body}');
+        debugPrint('Res---->>${response.body}');
         return EnquiryResponse.fromJson(jsonData);
       } else {
-        print('Failed to submit enquiry: ${response.statusCode}');
+        debugPrint('Failed to submit enquiry: ${response.statusCode}');
+        debugPrint('Response body: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error submitting enquiry: $e');
+      return null;
+    }
+  }
+
+  Future<EnquiryResponse?> _updateEnquiry(
+      int enquiryId, List<SelectedProduct> selectedItems) async {
+    try {
+      final String apiUrl = 'https://54kidsstreet.org/api/enquiry-update';
+      debugPrint('Update API URL: $apiUrl');
+      debugPrint('Update enquiry ID: $enquiryId');
+      // Use POST with _method = PUT for Laravel multipart support
+      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+      request.fields['_method'] = 'PUT';
+      request.fields['id'] = enquiryId.toString();
+
+      if (selectedItems.isNotEmpty && selectedItems.first.serviceId != null) {
+        request.fields['service_id'] = selectedItems.first.serviceId.toString();
+      } else {
+        request.fields['service_id'] = widget.subCategoryId.toString();
+      }
+
+      _populateRequestFields(request, selectedItems);
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      debugPrint('Update Response: ${response.body}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final jsonData = json.decode(response.body);
+        print('Update Res---->>${response.body}');
+        return EnquiryResponse.fromJson(jsonData);
+      } else {
+        print('Failed to update enquiry: ${response.statusCode}');
         print('Response body: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error submitting enquiry: $e');
+      print('Error updating enquiry: $e');
       return null;
     }
   }
@@ -226,19 +272,33 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
     });
 
     try {
-      EnquiryResponse? response =
-          await _submitEnquiry(selectedItems: selctedItems);
+      EnquiryResponse? response;
+      debugPrint('Submitted enquiry ID: $_submittedEnquiryId');
+      if (_submittedEnquiryId == null) {
+        debugPrint('Creating new enquiry');
+        // Create new enquiry
+        response = await _submitEnquiry(selectedItems: selctedItems);
+        if (response != null && response.status && response.data != null) {
+          _submittedEnquiryId = response.latestEnquiryId;
+        }
+        debugPrint('response: ${response}');
+        debugPrint('New enquiry created with ID: ${_submittedEnquiryId}');
+      } else {
+        debugPrint('Updating existing enquiry');
+        // Update existing enquiry
+        response = await _updateEnquiry(_submittedEnquiryId!, selctedItems);
+      }
 
       setState(() {
         _isSubmitting = false;
       });
 
       if (response != null && response.status) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) =>
-                EnquiryThankYouScreen(enquiryResponse: response),
+                EnquiryThankYouScreen(enquiryResponse: response!),
           ),
           // MaterialPageRoute(
           //   builder: (context) => EnquiryBookingConfirmationWithAmount(enquiryResponse: response),
@@ -497,7 +557,8 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
                     } else {
                       // Fallback to old behavior if no shiftData
                       final shiftData = ShiftData(
-                        subCategoryDesc: widget.shiftData?.subCategoryDesc??'',
+                        subCategoryDesc:
+                            widget.shiftData?.subCategoryDesc ?? '',
                         serviceId: 0,
                         serviceName: 'Multiple Services',
                         selectedDate: '',

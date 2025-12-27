@@ -186,531 +186,538 @@ class _MyRequestScreenState extends State<MyRequestScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator(color: darkBlue))
           : errorMessage != null
-          ? Center(
-        child: Text(
-          errorMessage!,
-          style: const TextStyle(color: darkBlue),
-        ),
-      )
-          : ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: enquiries.length,
-        itemBuilder: (context, index) {
-          final enquiry = enquiries[index];
-          final productsItem = enquiry["products_item"];
-          List<dynamic> paymentDetails = enquiry["payments_detail"];
+              ? Center(
+                  child: Text(
+                    errorMessage!,
+                    style: const TextStyle(color: darkBlue),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: enquiries.length,
+                  itemBuilder: (context, index) {
+                    final enquiry = enquiries[index];
+                    final productsItem = enquiry["products_item"];
+                    List<dynamic> paymentDetails = enquiry["payments_detail"];
 
-          List<dynamic> products = [];
-          try {
-            if (productsItem is String) {
-              products = json.decode(productsItem);
-            } else if (productsItem is List) {
-              products = productsItem;
-            }
-          } catch (e) {
-            products = [];
-          }
+                    List<dynamic> products = [];
+                    try {
+                      if (productsItem is String) {
+                        products = json.decode(productsItem);
+                      } else if (productsItem is List) {
+                        products = productsItem;
+                      }
+                    } catch (e) {
+                      products = [];
+                    }
 
-          return Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Request #${enquiry["order_no"]}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    paymentDetails.isNotEmpty &&
-                        paymentDetails.last['payment_status'] ==
-                            'success'
-                        ? Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: mediumBlue,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        "Success",
-                        style: TextStyle(
-                            color: Colors.white, fontSize: 12),
-                      ),
-                    )
-                        : GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                PendingScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: mediumBlue,
-                          borderRadius:
-                          BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          "Pending",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text(
-                      "From: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "${enquiry["pickup_location"] ?? ""}",
-                        style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black54,
-                            fontFamily: 'Poppins'),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Pickup Floor: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      "${enquiry["floor_number"] ?? "-"}",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Lift (Pickup): ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      "${(enquiry["pickup_services_lift"] ?? "0") == '0' ? 'Not Available' : 'Available'}",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "To: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "${enquiry["drop_location"] ?? ""}",
-                        maxLines: 2,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black54,
-                            fontFamily: 'Poppins'),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Destination Floor: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      "${enquiry["destination_floor_number"] ?? "N/A"}",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Lift (Drop): ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      "${(enquiry["drop_services_lift"] ?? "0") == '0' ? 'Not Available' : 'Available'}",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Shifting Date: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      AppFormatter.dateFormater(
-                          date:
-                          enquiry["shipping_date_time"] ?? "N/A"),
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Shifting Time: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      AppFormatter.timeFormater(
-                          date:
-                          enquiry["shipping_date_time"] ?? "N/A"),
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Created Date: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      AppFormatter.convertCreateDate(
-                          input: enquiry["created_at"] ?? "N/A"),
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Total CFT: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      "${enquiry["total_cft"]}",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Total Distance: ",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      "${enquiry["km_distance"]} KM",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Estimate Amount:",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: darkBlue,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins'),
-                    ),
-                    Text(
-                      " \u20B9${enquiry["total_amount"]}",
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins'),
-                    ),
-                  ],
-                ),
-                if (paymentDetails.isNotEmpty &&
-                    paymentDetails.last['payment_status'] ==
-                        'success') ...[
-                  SizedBox(
-                    height: 3,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "10% Paid Advance Amount: ",
-                        style: const TextStyle(
-                            fontSize: 14,
-                            color: darkBlue,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins'),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "\u20B9${(paymentDetails.last['amount'] ?? 0).toString()}(Paid)",
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Payment Date: ",
-                        style: const TextStyle(
-                            fontSize: 14,
-                            color: darkBlue,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins'),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "${AppFormatter.convertCreateDate(input: paymentDetails[0]['created_at'])}",
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 12),
-
-                // Products
-                if (products.isNotEmpty) ...[
-                  const Text(
-                    "Inventory:",
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: darkBlue,
-                        fontFamily: 'Poppins'),
-                  ),
-                  const SizedBox(height: 8),
-                  Column(
-                    children: products.map((p) {
-                      return Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              p["product_name"] ?? "",
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'Poppins'),
-                            ),
-                          ),
-                          Text(
-                            "Qty: ${p["quantity"]}",
-                            style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Poppins'),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
                           ),
                         ],
-                      );
-                    }).toList(),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  paymentDetails.isNotEmpty &&
-                      paymentDetails.last['payment_status'] ==
-                          'success'
-                      ? SizedBox(
-                    height: 40,
-                    width: MediaQuery.of(context).size.width,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: mediumBlue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(25),
-                        ),
                       ),
-                      child: Text(
-                        'Balance to pay ${calculateBalanceAmount(paidAmount: (paymentDetails.last['amount'] ?? 0).toString(), totalAmount: (enquiry["total_amount"] ?? 0).toString())}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: whiteColor,
-                          fontFamily: 'Poppins',
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Request #${enquiry["order_no"]}",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              paymentDetails.isNotEmpty &&
+                                      paymentDetails.last['payment_status'] ==
+                                          'success'
+                                  ? Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: mediumBlue,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Text(
+                                        "Success",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 12),
+                                      ),
+                                    )
+                                  : GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PendingScreen(),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: mediumBlue,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: const Text(
+                                          "Pending",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12),
+                                        ),
+                                      ),
+                                    )
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Text(
+                                "From: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "${enquiry["pickup_location"] ?? ""}",
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                      fontFamily: 'Poppins'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Pickup Floor: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                "${enquiry["floor_number"] ?? "-"}",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Lift (Pickup): ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                "${(enquiry["pickup_services_lift"] ?? "0") == '0' ? 'Not Available' : 'Available'}",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "To: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "${enquiry["drop_location"] ?? ""}",
+                                  maxLines: 2,
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                      fontFamily: 'Poppins'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Destination Floor: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                "${enquiry["destination_floor_number"] ?? "N/A"}",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Lift (Drop): ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                "${(enquiry["drop_services_lift"] ?? "0") == '0' ? 'Not Available' : 'Available'}",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Shifting Date: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                AppFormatter.dateFormater(
+                                    date:
+                                        enquiry["shipping_date_time"] ?? "N/A"),
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Shifting Time: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                AppFormatter.timeFormater(
+                                    date:
+                                        enquiry["shipping_date_time"] ?? "N/A"),
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Created Date: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                AppFormatter.convertCreateDate(
+                                    input: enquiry["created_at"] ?? "N/A"),
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Total CFT: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                "${enquiry["total_cft"]}",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Total Distance: ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                "${enquiry["km_distance"]} KM",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 3,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Estimate Amount:",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: darkBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                              Text(
+                                " \u20B9${enquiry["total_amount"]}",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins'),
+                              ),
+                            ],
+                          ),
+                          if (paymentDetails.isNotEmpty &&
+                              paymentDetails.last['payment_status'] ==
+                                  'success') ...[
+                            SizedBox(
+                              height: 3,
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  "10% Paid Advance Amount: ",
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      color: darkBlue,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Poppins'),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "\u20B9${(paymentDetails.last['amount'] ?? 0).toString()}(Paid)",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Poppins'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 3,
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  "Payment Date: ",
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      color: darkBlue,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Poppins'),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "${AppFormatter.convertCreateDate(input: paymentDetails[0]['created_at'])}",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Poppins'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          const SizedBox(height: 12),
+
+                          // Products
+                          if (products.isNotEmpty) ...[
+                            const Text(
+                              "Inventory:",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: darkBlue,
+                                  fontFamily: 'Poppins'),
+                            ),
+                            const SizedBox(height: 8),
+                            Column(
+                              children: products.map((p) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        p["product_name"] ?? "",
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: 'Poppins'),
+                                      ),
+                                    ),
+                                    Text(
+                                      "Qty: ${p["quantity"]}",
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: 'Poppins'),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            paymentDetails.isNotEmpty &&
+                                    paymentDetails.last['payment_status'] ==
+                                        'success'
+                                ? SizedBox(
+                                    height: 40,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: ElevatedButton(
+                                      onPressed: () {},
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: mediumBlue,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Balance to pay ${calculateBalanceAmount(paidAmount: (paymentDetails.last['amount'] ?? 0).toString(), totalAmount: (enquiry["total_amount"] ?? 0).toString())}',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: whiteColor,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(
+                                    height: 40,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: ElevatedButton(
+                                      onPressed: () => isPaymentLoading
+                                          ? null
+                                          : _payButtonSubmit(
+                                              orderNumber:
+                                                  (enquiry["order_no"] ?? '')
+                                                      .toString(),
+                                              amount: calculatePercentage(
+                                                  double.parse((enquiry[
+                                                              "total_amount"] ??
+                                                          0)
+                                                      .toString()))),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: mediumBlue,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Book Now \u20B9.${calculatePercentage(double.parse((enquiry["total_amount"] ?? 0).toString()))}',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: whiteColor,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ],
                       ),
-                    ),
-                  )
-                      : SizedBox(
-                    height: 40,
-                    width: MediaQuery.of(context).size.width,
-                    child: ElevatedButton(
-                      onPressed: () => isPaymentLoading
-                          ? null
-                          : _payButtonSubmit(
-                          orderNumber:
-                          (enquiry["order_no"] ?? '')
-                              .toString(),
-                          amount: calculatePercentage(
-                              double.parse((enquiry[
-                              "total_amount"] ??
-                                  0)
-                                  .toString()))),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: mediumBlue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(25),
-                        ),
-                      ),
-                      child: Text(
-                        'Book Now ${calculatePercentage(
-                            double.parse((enquiry[
-                            "total_amount"] ??
-                                0)
-                                .toString()))}\u20B9',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: whiteColor,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          );
-        },
-      ),
+                    );
+                  },
+                ),
     );
   }
 }

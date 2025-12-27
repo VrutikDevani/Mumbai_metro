@@ -5,14 +5,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:new_packers_application/lib/constant/app_color.dart';
+import '../widgets/location_autocomplete_field.dart';
 import 'package:new_packers_application/lib/constant/app_formatter.dart';
 import 'package:new_packers_application/lib/constant/app_strings.dart';
 
-import '../lib/views/map_picker_screen.dart';
 import '../models/ServiceEnquiryData.dart';
-import 'ServiceSelectionScreen.dart';
 import 'ThankYouScreen.dart';
 import 'TransportationFormScreen.dart';
 import '../lib/views/location_selection_screen.dart';
@@ -378,6 +375,7 @@ class _ServiceFormScreenWithCoordinateState
 
   final _pickupLocationController = TextEditingController();
   final _destinationLocationController = TextEditingController();
+  final _pickupHouseNoController = TextEditingController();
 
   DateTime? _selectedDate;
   LatLng? _selectedLocation;
@@ -465,36 +463,6 @@ class _ServiceFormScreenWithCoordinateState
   //   }
   // }
 
-  Future<void> _pickLocation(String type) async {
-    setState(() {
-      _locationType = type;
-    });
-
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const MapPickerScreen()),
-    );
-
-    if (result != null && result is Map) {
-      setState(() {
-        if (type == 'pickup') {
-          _pickupLocationController.text =
-              result['address'] ?? 'Unknown location';
-          _pickupCoordinates = result['coordinates'];
-        } else {
-          _destinationLocationController.text =
-              result['address'] ?? 'Unknown location';
-          _destinationCoordinates = result['coordinates'];
-        }
-      });
-      Fluttertoast.showToast(
-          msg:
-              "${type == 'pickup' ? 'Pickup' : 'Destination'} location selected successfully");
-    } else {
-      Fluttertoast.showToast(msg: "No location selected");
-    }
-  }
-
   Future<ServiceEnquiryResponse?> _submitServiceEnquiry() async {
     try {
       const String apiUrl =
@@ -505,17 +473,23 @@ class _ServiceFormScreenWithCoordinateState
       request.fields['customer_id'] = widget.customerId?.toString() ?? '0';
       request.fields['service_name'] = widget.subCategoryName;
       request.fields['service_description'] = 'NONE';
-      request.fields['service_location'] =
-          _pickupLocationController.text.trim();
+      String pickupHouse = _pickupHouseNoController.text.trim();
+      String pickupArea = _pickupLocationController.text.trim();
+      String fullPickupAddress =
+          pickupHouse.isNotEmpty ? "$pickupHouse, $pickupArea" : pickupArea;
+
+      String destArea = _destinationLocationController.text.trim();
+      String fullDestAddress = destArea;
+
+      request.fields['service_location'] = fullPickupAddress;
       request.fields['flat_no'] = _flatNumberController.text.trim();
       request.fields['notes'] = _notesController.text.trim();
       request.fields['service_date'] = _selectedDate != null
           ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
           : '';
 
-      request.fields['pickup_location'] = _pickupLocationController.text.trim();
-      request.fields['drop_location'] =
-          _destinationLocationController.text.trim();
+      request.fields['pickup_location'] = fullPickupAddress;
+      request.fields['drop_location'] = fullDestAddress;
       if (_pickupCoordinates != null) {
         request.fields['pickup_lat'] = _pickupCoordinates!.latitude.toString();
         request.fields['pickup_lng'] = _pickupCoordinates!.longitude.toString();
@@ -681,38 +655,6 @@ class _ServiceFormScreenWithCoordinateState
                   key: _formKey,
                   child: ListView(
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          const Text(
-                            'Service Name',
-                            style: TextStyle(
-                              color: darkBlue,
-                              fontSize: 16,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[400]!),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              widget.subCategoryName,
-                              style: const TextStyle(
-                                color: darkBlue,
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 10),
                       if (showBannerSection)
                         Container(
@@ -722,7 +664,7 @@ class _ServiceFormScreenWithCoordinateState
                             children: [
                               if (hasBanner)
                                 Container(
-                                  height: 150,
+                                  height: 180,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
@@ -758,7 +700,7 @@ class _ServiceFormScreenWithCoordinateState
                                 const SizedBox(height: 8),
                               if (hasDescription)
                                 Text(
-                                  widget.subCategoryDesc??"",
+                                  widget.subCategoryDesc ?? "",
                                   style: const TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: 14,
@@ -793,6 +735,45 @@ class _ServiceFormScreenWithCoordinateState
                       //   },
                       // ),
                       // const SizedBox(height: 16),
+
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: whiteColor,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: mediumBlue.withOpacity(0.3),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: darkBlue.withOpacity(0.08),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.subCategoryName,
+                                style: const TextStyle(
+                                  color: darkBlue,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'Poppins',
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
                       Padding(
                         padding: EdgeInsets.only(top: 8.0, bottom: 12),
                         child: const Text(
@@ -1024,68 +1005,59 @@ class _ServiceFormScreenWithCoordinateState
                       const SizedBox(height: 16),
 
                       // Pickup Location
+                      // Pickup Location
+                      const Text('Pickup Location',
+                          style: TextStyle(
+                              color: darkBlue,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
                       TextFormField(
-                        controller: _pickupLocationController,
-                        readOnly: true,
+                        controller: _pickupHouseNoController,
                         decoration: InputDecoration(
-                          labelText: 'Pickup Location',
+                          labelText: 'House / Flat No',
                           labelStyle: const TextStyle(color: darkBlue),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                              borderRadius: BorderRadius.circular(10)),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: mediumBlue),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.location_on,
-                                color: mediumBlue),
-                            onPressed: () => _pickLocation('pickup'),
-                          ),
+                              borderSide: const BorderSide(color: mediumBlue),
+                              borderRadius: BorderRadius.circular(10)),
                         ),
-                        onTap: () => _pickLocation('pickup'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select pickup location';
-                          }
-                          return null;
+                      ),
+                      const SizedBox(height: 10),
+                      LocationAutocompleteField(
+                        controller: _pickupLocationController,
+                        hintText: 'Search Pickup Society / Area',
+                        onLocationSelected: (result) {
+                          setState(() {
+                            _pickupCoordinates = result.location;
+                          });
                         },
                       ),
                       const SizedBox(height: 16),
 
                       // Destination Location
-                      TextFormField(
+                      const Text('Destination Location',
+                          style: TextStyle(
+                              color: darkBlue,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+
+                      LocationAutocompleteField(
                         controller: _destinationLocationController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Destination Location',
-                          labelStyle: const TextStyle(color: darkBlue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: mediumBlue),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.location_on,
-                                color: mediumBlue),
-                            onPressed: () => _pickLocation('destination'),
-                          ),
-                        ),
-                        onTap: () => _pickLocation('destination'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select destination location';
-                          }
-                          return null;
+                        hintText: 'Search Destination Society / Area',
+                        onLocationSelected: (result) {
+                          setState(() {
+                            _destinationCoordinates = result.location;
+                          });
                         },
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _notesController,
                         decoration: InputDecoration(
-                          labelText: 'Notes/Instructions',
+                          labelText: 'Notes/Special Instructions',
                           labelStyle: const TextStyle(color: darkBlue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -1169,6 +1141,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _serviceDescriptionController = TextEditingController();
   final _serviceLocationController = TextEditingController();
+  final _serviceHouseNoController = TextEditingController();
   final _flatNumberController = TextEditingController();
   DateTime? _selectedDate;
   LatLng? _selectedLocation;
@@ -1206,24 +1179,6 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
     }
   }
 
-  Future<void> _pickLocation() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const MapPickerScreen()),
-    );
-
-    if (result != null && result is Map) {
-      setState(() {
-        _serviceLocationController.text =
-            result['address'] ?? 'Unknown location';
-        _selectedLocation = result['coordinates'];
-      });
-      Fluttertoast.showToast(msg: "Location selected successfully");
-    } else {
-      Fluttertoast.showToast(msg: "No location selected");
-    }
-  }
-
   Future<ServiceEnquiryResponse?> _submitServiceEnquiry() async {
     try {
       const String apiUrl =
@@ -1237,8 +1192,11 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
           _serviceDescriptionController.text.isNotEmpty
               ? _serviceDescriptionController.text.trim()
               : 'NONE';
-      request.fields['service_location'] =
-          _serviceLocationController.text.trim();
+      String houseNo = _flatNumberController.text.trim();
+      String area = _serviceLocationController.text.trim();
+      String fullAddress = houseNo.isNotEmpty ? "$houseNo, $area" : area;
+
+      request.fields['service_location'] = fullAddress;
       request.fields['flat_no'] = _flatNumberController.text.trim();
       request.fields['service_date'] = _selectedDate != null
           ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
@@ -1251,8 +1209,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
 
       //Field which was null
 
-      request.fields['pickup_location'] =
-          _serviceLocationController.text.trim();
+      request.fields['pickup_location'] = fullAddress;
       request.fields['drop_location'] = 'NONE';
 
       if (_selectedLocation != null) {
@@ -1385,38 +1342,39 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                   key: _formKey,
                   child: ListView(
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Service Name',
-                            style: TextStyle(
-                              color: darkBlue,
-                              fontSize: 16,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[400]!),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              widget.subCategoryName,
-                              style: const TextStyle(
-                                color: darkBlue,
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Column(
+                      //   crossAxisAlignment: CrossAxisAlignment.start,
+                      //   children: [
+                      //     const SizedBox(height: 16),
+                      //     const Text(
+                      //       'Service Name',
+                      //       style: TextStyle(
+                      //         color: darkBlue,
+                      //         fontSize: 16,
+                      //         fontFamily: 'Poppins',
+                      //       ),
+                      //     ),
+                      //     const SizedBox(height: 8),
+                      //     Container(
+                      //       width: double.infinity,
+                      //       padding: const EdgeInsets.symmetric(
+                      //           vertical: 12, horizontal: 16),
+                      //       decoration: BoxDecoration(
+                      //         border: Border.all(color: Colors.grey[400]!),
+                      //         borderRadius: BorderRadius.circular(10),
+                      //       ),
+                      //       child: Text(
+                      //         widget.subCategoryName,
+                      //         style: const TextStyle(
+                      //           color: darkBlue,
+                      //           fontSize: 16,
+                      //           fontFamily: 'Poppins',
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+
                       if (showBannerSection)
                         Container(
                           padding: const EdgeInsets.all(0.0),
@@ -1426,7 +1384,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                               const SizedBox(height: 8),
                               if (hasBanner)
                                 Container(
-                                  height: 150,
+                                  height: 180,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
@@ -1446,11 +1404,11 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                                         debugPrint(
                                             "Image loading error: $error");
                                         return Container(
-                                          color: lightBlue,
-                                          child: const Center(
-                                            child: Text(
-                                              'Image not available',
-                                              style: TextStyle(color: darkBlue),
+                                          height: 150,
+                                          color: whiteColor,
+                                          child: Center(
+                                            child: Image.asset(
+                                              'assets/applogo.jpeg',
                                             ),
                                           ),
                                         );
@@ -1458,8 +1416,9 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                                     ),
                                   ),
                                 ),
-                              if (hasBanner && hasDescription)
-                                const SizedBox(height: 8),
+                              if (hasBanner && hasDescription) ...[
+                                const SizedBox(height: 16),
+                              ],
                               if (hasDescription)
                                 Text(
                                   widget.subCategoryDesc!,
@@ -1471,6 +1430,44 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                                   maxLines: 10,
                                   overflow: TextOverflow.ellipsis,
                                 ),
+                              const SizedBox(height: 16),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 20),
+                                decoration: BoxDecoration(
+                                  color: whiteColor,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    color: mediumBlue.withOpacity(0.3),
+                                    width: 1.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: darkBlue.withOpacity(0.08),
+                                      blurRadius: 15,
+                                      offset: const Offset(0, 5),
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        widget.subCategoryName,
+                                        style: const TextStyle(
+                                          color: darkBlue,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'Poppins',
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -1496,31 +1493,22 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
+                      // Service Location
+                      const Text('Service Location',
+                          style: TextStyle(
+                              color: darkBlue,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
+                      LocationAutocompleteField(
                         controller: _serviceLocationController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Service Location',
-                          labelStyle: const TextStyle(color: darkBlue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: mediumBlue),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.location_on,
-                                color: mediumBlue),
-                            onPressed: _pickLocation,
-                          ),
-                        ),
-                        onTap: _pickLocation,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select a service location';
-                          }
-                          return null;
+                        hintText: 'Search Service Society / Area',
+                        onLocationSelected: (result) {
+                          setState(() {
+                            _selectedLocation = result.location;
+                            _serviceLocationController.text = result.title;
+                          });
                         },
                       ),
                       const SizedBox(height: 16),
@@ -1559,7 +1547,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
                       TextFormField(
                         controller: _serviceDescriptionController,
                         decoration: InputDecoration(
-                          labelText: 'Notes/Instructions',
+                          labelText: 'Notes/Special Instructions',
                           labelStyle: const TextStyle(color: darkBlue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),

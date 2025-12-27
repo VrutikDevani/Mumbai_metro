@@ -6,12 +6,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:new_packers_application/lib/constant/app_drawer.dart';
 import 'package:new_packers_application/lib/constant/app_strings.dart';
+import 'package:new_packers_application/lib/models/app_policy_model.dart';
 import 'package:new_packers_application/views/VendorRegScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../lib/models/customer_data_model.dart';
 import '../lib/views/MyRequestScreen.dart';
 import '../lib/views/login_view.dart';
+import '../lib/views/payment_details_screen.dart';
 import '../models/UserData.dart';
 import 'SubCategoryScreen.dart';
 
@@ -44,6 +46,7 @@ class _HomeServiceViewState extends State<HomeServiceView> {
   }
 
   fetchAllData() async {
+    await fetchPolicy();
     await fetchData();
     await _fetchCategories();
     await _fetchBanners();
@@ -52,6 +55,44 @@ class _HomeServiceViewState extends State<HomeServiceView> {
   CustomerModel? customerModel;
 
   bool isLoading = true;
+  PolicyModel? privacyModel;
+  fetchPolicy() async {
+    if (privacyModel == null) {
+      setState(() {
+        isLoading = true;
+      });
+      try {
+        final String baseUrl = "http://54kidsstreet.org"; // your domain
+
+        final response = await http.get(
+          Uri.parse('$baseUrl/api/policies'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        );
+
+        log('➡️ API Response: ${response.body}');
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          // Assuming PolicyModel.fromJson now correctly handles the PolicyData structure
+          // where contactUs is ContactData and other policies are PolicyItem/AboutUsModel
+          privacyModel = PolicyModel.fromJson(jsonData);
+        } else {
+          log('⚠️ Failed to fetch: ${response.statusCode}');
+
+          privacyModel = null;
+        }
+      } catch (e) {
+        log('❌ Error fetching policies: $e');
+
+        privacyModel = null;
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   Future<void> fetchData() async {
     try {
@@ -168,14 +209,58 @@ class _HomeServiceViewState extends State<HomeServiceView> {
   }
 
   Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('isLoggedIn');
-    await prefs.remove('customerId');
-    await prefs.remove('userData');
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginView()),
-      (route) => false,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Logout',
+            style:
+                TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(fontFamily: 'Poppins'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close dialog first
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove('isLoggedIn');
+                await prefs.remove('customerId');
+                await prefs.remove('userData');
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginView()),
+                  (route) => false,
+                );
+              },
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -236,8 +321,18 @@ class _HomeServiceViewState extends State<HomeServiceView> {
     );
   }
 
+  Future<void> _navigateToPaymentDetails() async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentDetailsScreen(),
+        ));
+  }
+
   void _openWhatsApp() async {
-    final String phoneNumber = '919022062666';
+    final String phoneNumber =
+        privacyModel?.data.homePage.chatNumber ?? '919022062666';
+    log("chatNumber====================${privacyModel?.data.homePage.chatNumber}");
     final String message = 'Hello from HomeServiceView';
 
     final Uri whatsappAppUri = Uri.parse(
@@ -262,7 +357,11 @@ class _HomeServiceViewState extends State<HomeServiceView> {
   }
 
   void _makePhoneCall() async {
-    final Uri phoneUri = Uri(scheme: 'tel', path: '8888888888');
+    final Uri phoneUri = Uri(
+      scheme: 'tel',
+      path: privacyModel?.data.homePage.callNumber ?? '8888888888',
+    );
+    log("callNumber====================${privacyModel?.data.homePage.callNumber}");
     if (await canLaunchUrl(phoneUri)) {
       await launchUrl(phoneUri);
     } else {
@@ -345,8 +444,8 @@ class _HomeServiceViewState extends State<HomeServiceView> {
           Center(
             child: imageUrl != null && imageUrl.isNotEmpty
                 ? SizedBox(
-                    height: 28,
-                    width: 28,
+                    height: 40,
+                    width: 40,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(1000),
                       child: FadeInImage.assetNetwork(
@@ -385,17 +484,22 @@ class _HomeServiceViewState extends State<HomeServiceView> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(
+        privacyModel: privacyModel,
+      ),
       //
       backgroundColor: darkBlue,
       appBar: AppBar(
-        title: const Text(
-          'Mumbai Metro Packers and Movers',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-            color: whiteColor,
-            fontSize: 18,
+        title: const FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(
+            'Mumbai Metro Packers and Movers',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+              color: whiteColor,
+              fontSize: 18,
+            ),
           ),
         ),
         backgroundColor: darkBlue,
@@ -501,7 +605,7 @@ class _HomeServiceViewState extends State<HomeServiceView> {
                                   padding: const EdgeInsets.all(16.0),
                                   crossAxisSpacing: 10,
                                   mainAxisSpacing: 10,
-                            childAspectRatio: 2.0,
+                                  childAspectRatio: 1.5,
                                   children: [
                                     ...categories.map(
                                         (cat) => _buildCategoryButton(cat)),
@@ -514,6 +618,11 @@ class _HomeServiceViewState extends State<HomeServiceView> {
                                       'Vendor Registration',
                                       Icons.person,
                                       onTap: _navigateToVendorReg,
+                                    ),
+                                    _buildButton(
+                                      'Payment Details',
+                                      Icons.payment,
+                                      onTap: _navigateToPaymentDetails,
                                     ),
                                   ],
                                 ),

@@ -267,6 +267,14 @@ class _EnquiryBookingConfirmationWithAmountState
                       ),
                     ),
                   ),
+                ],
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Row(
+                spacing: 20,
+                children: [
                   Expanded(
                     child: SizedBox(
                       height: 45,
@@ -470,7 +478,8 @@ class EnquiryThankYouScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 15),
                       ..._parseAndDisplayProducts(
-                          enquiryResponse.data!.productsItem),
+                        enquiryResponse.data!.productsItem,
+                      ),
                     ],
                   ),
                 ),
@@ -606,7 +615,12 @@ class EnquiryThankYouScreen extends StatelessWidget {
                     color: mediumBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.chair_alt, color: mediumBlue),
+                  child: Center(
+                    child: Text(
+                      (products.indexOf(product) + 1).toString(),
+                      style: TextStyle(fontSize: 18, color: darkBlue),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
 

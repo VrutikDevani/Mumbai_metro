@@ -11,8 +11,8 @@ class EnquiryData {
   final String dropServicesLift;
   final String productsItem;
   final int orderNo;
-   var amount;
-   var distance;
+  var amount;
+  var distance;
   final String updatedAt;
   final String createdAt;
   final int id;
@@ -48,13 +48,18 @@ class EnquiryData {
       pickupServicesLift: json['pickup_services_lift'] ?? '',
       dropServicesLift: json['drop_services_lift'] ?? '',
       productsItem: json['products_item'] ?? '',
-      orderNo: json['order_no'] ?? 0,
+      orderNo: int.tryParse(json['order_no']?.toString() ?? '0') ?? 0,
       updatedAt: json['updated_at'] ?? '',
-      amount: json['total_amount']??0,
-      distance: json['km_distance']??0,
+      amount: json['total_amount'] ?? 0,
+      distance: json['km_distance'] ?? 0,
       createdAt: json['created_at'] ?? '',
-      id: json['id'] ?? 0,
+      id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
     );
+  }
+
+  @override
+  String toString() {
+    return 'EnquiryData(id: $id, customerId: $customerId, orderNo: $orderNo, amount: $amount)';
   }
 }
 
@@ -62,6 +67,7 @@ class EnquiryResponse {
   final bool status;
   final String msg;
   final int totalCft;
+  final int latestEnquiryId;
   final EnquiryData? data;
 
   EnquiryResponse({
@@ -69,6 +75,7 @@ class EnquiryResponse {
     required this.msg,
     this.data,
     required this.totalCft,
+    this.latestEnquiryId = 0,
   });
 
   factory EnquiryResponse.fromJson(Map<String, dynamic> json) {
@@ -76,9 +83,8 @@ class EnquiryResponse {
       status: json['status'] ?? false,
       msg: json['msg'] ?? '',
       totalCft: json['total_cft'] ?? 0,
-      data: json['data'] != null
-          ? EnquiryData.fromJson(json['data'])
-          : null,
+      latestEnquiryId: json['latest_enquiry_id'] ?? 0,
+      data: json['data'] != null ? EnquiryData.fromJson(json['data']) : null,
     );
   }
 }
