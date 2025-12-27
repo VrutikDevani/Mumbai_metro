@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../models/PaymentModel.dart';
 
@@ -9,9 +10,7 @@ const Color lightBlue = Color(0xFF7ed2f7);
 const Color whiteColor = Color(0xFFf7f7f7);
 
 class PaymentDetailsScreen extends StatefulWidget {
-  final int customerId; // Accept customerId
-  const PaymentDetailsScreen(
-      {super.key, this.customerId = 41}); // Default for now
+  const PaymentDetailsScreen({super.key});
 
   @override
   State<PaymentDetailsScreen> createState() => _PaymentDetailsScreenState();
@@ -30,28 +29,38 @@ class _PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
 
   Future<void> _fetchPayments() async {
     try {
-      final String apiUrl =
-          'https://54kidsstreet.org/api/customer/${widget.customerId}/payments';
-      final response = await http.get(Uri.parse(apiUrl));
+      final prefs = await SharedPreferences.getInstance();
+      final String? customerId = prefs.getString('customerId');
+      if (customerId != '') {
+        final String apiUrl =
+            'https://54kidsstreet.org/api/customer/${(customerId ?? 41).toString()}/payments';
+        final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        if (jsonData['success'] == true) {
-          setState(() {
-            payments = (jsonData['data'] as List)
-                .map((data) => PaymentModel.fromJson(data))
-                .toList();
-            isLoading = false;
-          });
+        if (response.statusCode == 200) {
+          final jsonData = json.decode(response.body);
+          if (jsonData['success'] == true) {
+            setState(() {
+              payments = (jsonData['data'] as List)
+                  .map((data) => PaymentModel.fromJson(data))
+                  .toList();
+              isLoading = false;
+            });
+          } else {
+            setState(() {
+              errorMessage = 'Failed to load payments';
+              isLoading = false;
+            });
+          }
         } else {
           setState(() {
-            errorMessage = 'Failed to load payments';
+            errorMessage = 'Error: ${response.statusCode}';
             isLoading = false;
           });
         }
       } else {
         setState(() {
-          errorMessage = 'Error: ${response.statusCode}';
+          errorMessage =
+              'No user found please logout user and try with re-login';
           isLoading = false;
         });
       }
@@ -94,8 +103,12 @@ class _PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
           ? const Center(child: CircularProgressIndicator(color: darkBlue))
           : errorMessage != null
               ? Center(
-                  child: Text(errorMessage!,
-                      style: const TextStyle(color: Colors.red)))
+                  child: Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                )
               : payments.isEmpty
                   ? const Center(child: Text("No payments found"))
                   : ListView.builder(
@@ -125,7 +138,7 @@ class _PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
                                 _buildDetailRow(
                                     "E-MAIL", "${customer?.email ?? 'N/A'}"),
                                 _buildDetailRow("10% Paid Amount",
-                                    "₹${payment.totalAmount ?? '0.00'}"),
+                                    "₹${payment.amount ?? '0.00'}"),
                                 _buildDetailRow("Payment (Transaction) Id",
                                     "${payment.transactionId ?? 'N/A'}"),
                                 _buildDetailRow(

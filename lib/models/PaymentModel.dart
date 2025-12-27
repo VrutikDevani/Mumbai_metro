@@ -3,6 +3,7 @@ class PaymentModel {
   final String? transactionId;
   final String? orderNo;
   final String? totalAmount;
+  final String? amount;
   final String? paymentStatus;
   final String? paymentMethod;
   final String? paymentDate;
@@ -20,12 +21,14 @@ class PaymentModel {
     this.paymentDate,
     this.currency,
     this.customer,
+    this.amount,
   });
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) {
     return PaymentModel(
       id: json['id'],
       transactionId: json['transaction_id'],
+      amount: json['amount'].toString(),
       orderNo: json['order_no'],
       totalAmount: json['total_amount'],
       paymentStatus: json['payment_status'],
